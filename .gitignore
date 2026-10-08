@@ -1,0 +1,29 @@
+# 密钥与本地配置：绝对不要提交
+.env
+.env.local
+*.key
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.db
+*.sqlite3
+
+# 运行产物与日志
+logs/
+*.log
+
+# 评测输出
+tests/reports/
+
+# 知识库素材：体积大且可由脚本重新生成，不进仓库
+# 别人克隆后跑 kb-assets/README.md 里的命令即可复现
+kb-assets/data/
+kb-assets/output/
+
+# 编辑器
+.idea/
+.vscode/
+.DS_Store

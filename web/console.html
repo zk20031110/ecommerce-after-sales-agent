@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>售后坐席工作台</title>
+<style>
+  :root{
+    --bg:#0f1418; --panel:#161d23; --line:#26313a; --ink:#dfe9ef; --dim:#7b8d99;
+    --hot:#ff6b6b; --ok:#4ade80; --warn:#fbbf24; --accent:#38bdf8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;height:100vh;display:flex;flex-direction:column;background:var(--bg);
+       color:var(--ink);font:14px/1.6 "Microsoft YaHei",-apple-system,sans-serif}
+  header{display:flex;align-items:center;gap:18px;padding:12px 18px;border-bottom:1px solid var(--line);
+         background:var(--panel)}
+  header h1{margin:0;font-size:15px;font-weight:600;letter-spacing:.05em}
+  header .stat{display:flex;gap:6px;align-items:baseline;font-size:12px;color:var(--dim)}
+  header .stat b{font-size:18px;color:var(--ink);font-weight:600}
+  header .stat.hot b{color:var(--hot)}
+  header .spacer{flex:1}
+  header input{background:#0d1216;border:1px solid var(--line);color:var(--ink);
+               border-radius:4px;padding:5px 9px;font:inherit;font-size:12px;width:190px}
+  main{flex:1;display:grid;grid-template-columns:340px 1fr;min-height:0}
+  #list{border-right:1px solid var(--line);overflow-y:auto;background:#12181d}
+  #list .item{padding:11px 14px;border-bottom:1px solid var(--line);cursor:pointer}
+  #list .item:hover{background:#1a2329}
+  #list .item.on{background:#1d2831;box-shadow:inset 3px 0 0 var(--accent)}
+  #list .item .top{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--dim)}
+  #list .item .sum{margin-top:4px;font-size:13px}
+  .tag{font-size:11px;padding:1px 6px;border-radius:3px;border:1px solid var(--line)}
+  .tag.hot{color:var(--hot);border-color:#7f2d2d;background:#2a1616}
+  .tag.wait{color:var(--warn);border-color:#6b5420;background:#2a2416}
+  .tag.doing{color:var(--accent);border-color:#1c4a63;background:#122630}
+  .tag.done{color:var(--ok);border-color:#245c3a;background:#12251a}
+  #detail{padding:18px 22px;overflow-y:auto}
+  #detail .empty{color:var(--dim);text-align:center;margin-top:80px}
+  h2{margin:0 0 4px;font-size:16px}
+  .meta{color:var(--dim);font-size:12px;margin-bottom:14px}
+  .card{border:1px solid var(--line);border-radius:6px;padding:12px 14px;margin-bottom:14px;background:var(--panel)}
+  .card h3{margin:0 0 8px;font-size:13px;color:var(--dim);font-weight:600;letter-spacing:.05em}
+  pre{margin:0;white-space:pre-wrap;word-break:break-word;font:13px/1.7 "Microsoft YaHei",monospace}
+  .bubble{padding:7px 11px;border-radius:6px;margin-bottom:7px;font-size:13px}
+  .bubble.customer{background:#1e2a33}
+  .bubble.agent{background:#152a20;border-left:3px solid var(--ok)}
+  .bubble.ai{background:#141d28;border-left:3px solid #58a6ff}
+  .bubble.system{background:#20242a;color:var(--dim);font-size:12px}
+  .bubble .who{font-size:11px;color:var(--dim);margin-bottom:2px}
+  textarea{width:100%;min-height:70px;background:#0d1216;border:1px solid var(--line);
+           color:var(--ink);border-radius:5px;padding:9px;font:inherit;resize:vertical}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px;align-items:center}
+  select{background:#0d1216;border:1px solid var(--line);color:var(--ink);border-radius:4px;padding:6px 9px;font:inherit;font-size:13px}
+  button{background:#1f2b34;color:var(--ink);border:1px solid var(--line);border-radius:5px;
+         padding:7px 14px;font:inherit;font-size:13px;cursor:pointer}
+  button:hover{border-color:var(--accent);color:var(--accent)}
+  button.primary{background:var(--accent);color:#04121a;border-color:var(--accent);font-weight:600}
+  button.primary:hover{filter:brightness(1.12)}
+  button.danger:hover{border-color:var(--hot);color:var(--hot)}
+</style>
+</head>
+<body>
+<header>
+  <h1>售后坐席工作台</h1>
+  <div class="stat hot">排队中 <b id="s-wait">0</b></div>
+  <div class="stat">处理中 <b id="s-doing">0</b></div>
+  <div class="stat">已解决 <b id="s-done">0</b></div>
+  <div class="stat hot">高优先级 <b id="s-hot">0</b></div>
+  <div class="spacer"></div>
+  <div class="stat">坐席</div>
+  <input id="agent" value="小陈 8801">
+  <button id="refresh">刷新</button>
+</header>
+<main>
+  <div id="list"></div>
+  <div id="detail"><div class="empty">左侧选一张工单</div></div>
+</main>
+<script>
+const KEY = 'dev-local-key';          // 与后端 MOCK_API_KEY 一致
+let tickets = [], current = null;
+// 坐席正在打的回复内容。工作台每 5 秒自动刷新，重绘会把输入框清空，
+// 所以草稿要存在外面，重绘后再填回去——不然坐席打一半的字全没了。
+let draftReply = '';
+
+const api = async (path, opt = {}) => {
+  const r = await fetch(path, {
+    ...opt,
+    headers: { 'X-API-Key': KEY, 'Content-Type': 'application/json', ...(opt.headers || {}) },
+  });
+  return r.json();
+};
+const agent = () => document.getElementById('agent').value.trim() || '人工坐席';
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const badge = st => st === '排队中' ? 'wait' : st === '处理中' ? 'doing' : 'done';
+
+async function load() {
+  const s = await api('/api/console/summary');
+  const t = s.tickets || {};
+  document.getElementById('s-wait').textContent = t['排队中'] ?? 0;
+  document.getElementById('s-doing').textContent = t['处理中'] ?? 0;
+  document.getElementById('s-done').textContent = t['已解决'] ?? 0;
+  document.getElementById('s-hot').textContent = t['高优先级'] ?? 0;
+
+  const res = await api('/api/tickets?limit=100');
+  tickets = res.items || [];
+  renderList();
+  if (current) {
+    const fresh = tickets.find(x => x.ticket_id === current.ticket_id);
+    if (fresh) { current = fresh; renderDetail(); }
+  }
+}
+
+function renderList() {
+  const el = document.getElementById('list');
+  if (!tickets.length) { el.innerHTML = '<div class="empty" style="padding:20px;color:#7b8d99">还没有工单</div>'; return; }
+  el.innerHTML = tickets.map(t => `
+    <div class="item ${current && current.ticket_id === t.ticket_id ? 'on' : ''}" data-id="${t.ticket_id}">
+      <div class="top">
+        <span>${esc(t.ticket_id)}</span>
+        <span class="tag ${badge(t.status)}">${esc(t.status)}</span>
+      </div>
+      <div class="sum">${esc((t.summary || t.intent || '').slice(0, 28))}</div>
+      <div class="top" style="margin-top:4px">
+        <span>${esc(t.order_no || '无订单号')}</span>
+        ${t.priority === '高' ? '<span class="tag hot">高</span>' : ''}
+      </div>
+    </div>`).join('');
+  el.querySelectorAll('.item').forEach(n => n.onclick = () => {
+    current = tickets.find(x => x.ticket_id === n.dataset.id);
+    renderList(); renderDetail();
+  });
+}
+
+function renderDetail() {
+  const t = current, el = document.getElementById('detail');
+  if (!t) { el.innerHTML = '<div class="empty">左侧选一张工单</div>'; return; }
+  const replies = (t.replies || []).map(r =>
+    `<div class="bubble agent"><div class="who">${esc(r.agent)} · ${esc((r.at || '').slice(11, 16))}</div>${esc(r.text)}</div>`).join('');
+  el.innerHTML = `
+    <h2>${esc(t.summary || t.intent)}</h2>
+    <div class="meta">
+      ${esc(t.ticket_id)} ｜ 状态 <span class="tag ${badge(t.status)}">${esc(t.status)}</span>
+      ｜ 优先级 ${esc(t.priority)} ｜ 坐席 ${esc(t.agent || '未接入')}
+    </div>
+
+    <div class="card">
+      <h3>交接摘要（客户无需重复叙述）</h3>
+      <pre>${esc(t.handoff || '（无）')}</pre>
+    </div>
+
+    <div class="card">
+      <h3>完整对话记录</h3>
+      <div id="convo"><div style="color:#7b8d99">加载中…</div></div>
+    </div>
+
+    <div class="card">
+      <h3>处理结果</h3>
+      <pre>${esc(t.resolution || '未关闭')}${t.unresolved_reason ? '　未解决原因：' + esc(t.unresolved_reason) : ''}</pre>
+    </div>
+
+    <div class="card">
+      <h3>坐席回复</h3>
+      ${replies || '<div style="color:#7b8d99">还没有回复</div>'}
+      <textarea id="reply" placeholder="回复客户…（承接上文，不要让客户重讲）">${esc(draftReply)}</textarea>
+      <div class="row">
+        <button class="primary" id="btn-reply">发送回复</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>操作</h3>
+      <div class="row">
+        <button class="primary" id="btn-claim">接入工单</button>
+        <button id="btn-escalate">转主管</button>
+        <button class="danger" id="btn-close">关闭工单</button>
+      </div>
+      <div class="row">
+        <select id="resolution">
+          <option value="">— 处理结果（关闭时必填）—</option>
+          <option>已退款</option><option>已换货</option>
+          <option>已解释</option><option>无解转主管</option>
+        </select>
+        <select id="reason">
+          <option value="">— 未解决原因（周度迭代用）—</option>
+          <option>超期政策限制</option><option>坐席权限不足</option>
+          <option>客户不接受方案</option><option>情绪未平复</option>
+          <option>系统故障</option><option>客户诉求不明确</option>
+        </select>
+        <select id="csat">
+          <option value="">— 满意度 —</option>
+          <option value="5">5 很满意</option><option value="4">4 满意</option>
+          <option value="3">3 一般</option><option value="2">2 不满意</option><option value="1">1 很不满意</option>
+        </select>
+      </div>
+    </div>`;
+
+  const post = async (path, body) => {
+    const r = await api(path, { method: 'POST', body: JSON.stringify(body) });
+    if (r.ok === false) alert(r.message || '操作失败');
+    await load();
+  };
+  document.getElementById('btn-claim').onclick = () =>
+    post(`/api/tickets/${t.ticket_id}/claim`, { agent: agent() });
+  document.getElementById('btn-reply').onclick = () => {
+    const box = document.getElementById('reply');
+    const text = box.value.trim();
+    if (!text) return alert('回复内容不能为空');
+    draftReply = '';
+    post(`/api/tickets/${t.ticket_id}/reply`, { agent: agent(), text });
+  };
+  const replyBox = document.getElementById('reply');
+  if (replyBox) replyBox.oninput = () => { draftReply = replyBox.value; };
+  document.getElementById('btn-escalate').onclick = () =>
+    post(`/api/tickets/${t.ticket_id}/escalate`, { agent: agent() });
+  document.getElementById('btn-close').onclick = () => {
+    const resolution = document.getElementById('resolution').value;
+    if (!resolution) return alert('关闭前必须选处理结果');
+    post(`/api/tickets/${t.ticket_id}/close`, {
+      agent: agent(), resolution,
+      unresolved_reason: document.getElementById('reason').value,
+      csat: document.getElementById('csat').value ? Number(document.getElementById('csat').value) : null,
+    });
+  };
+
+  // 拉完整对话记录：坐席接手时不能只看摘要，得能看到客户原话的上下文
+  const convo = document.getElementById('convo');
+  if (convo && t.session_id) {
+    fetch('/api/conversation/' + encodeURIComponent(t.session_id),
+          { headers: { 'X-API-Key': KEY } })
+      .then(r => r.json())
+      .then(d => {
+        const msgs = d.messages || [];
+        const label = { customer: '客户', ai: 'AI 小岚', agent: '人工客服', system: '系统' };
+        convo.innerHTML = msgs.length
+          ? msgs.map(m => `<div class="bubble ${m.role}">
+              <div class="who">${label[m.role] || m.role}</div>${esc(m.content)}</div>`).join('')
+          : '<div style="color:#7b8d99">这个会话还没有对话记录</div>';
+      })
+      .catch(() => { convo.innerHTML = '<div style="color:#7b8d99">对话记录加载失败</div>'; });
+  } else if (convo) {
+    convo.innerHTML = '<div style="color:#7b8d99">这张工单没有关联会话</div>';
+  }
+}
+
+document.getElementById('refresh').onclick = load;
+load();
+setInterval(load, 5000);   // 每 5 秒自动刷新，新工单会自己冒出来
+</script>
+</body>
+</html>
