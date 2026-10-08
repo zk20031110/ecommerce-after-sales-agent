@@ -239,11 +239,47 @@ workflow:
         isInIteration: false
         isInLoop: false
         sourceType: question-classifier
-        targetType: knowledge-retrieval
-      id: 1800000000002-4-1800000000013-target
+        targetType: question-classifier
+      id: 1800000000002-4-1800000000028-target
       source: '1800000000002'
       sourceHandle: '4'
+      target: '1800000000028'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: knowledge-retrieval
+      id: 1800000000028-1-1800000000013-target
+      source: '1800000000028'
+      sourceHandle: '1'
       target: '1800000000013'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: knowledge-retrieval
+      id: 1800000000028-2-1800000000029-target
+      source: '1800000000028'
+      sourceHandle: '2'
+      target: '1800000000029'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: knowledge-retrieval
+      id: 1800000000028-3-1800000000030-target
+      source: '1800000000028'
+      sourceHandle: '3'
+      target: '1800000000030'
       targetHandle: target
       type: custom
       zIndex: 0
@@ -367,6 +403,166 @@ workflow:
       targetHandle: target
       type: custom
       zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: http-request
+      id: 1800000000002-8-1800000000025-target
+      source: '1800000000002'
+      sourceHandle: '8'
+      target: '1800000000025'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: llm
+      id: 1800000000025-source-1800000000026-target
+      source: '1800000000025'
+      sourceHandle: source
+      target: '1800000000026'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 1800000000026-source-1800000000027-target
+      source: '1800000000026'
+      sourceHandle: source
+      target: '1800000000027'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: knowledge-retrieval
+        targetType: llm
+      id: 1800000000029-source-1800000000014-target
+      source: '1800000000029'
+      sourceHandle: source
+      target: '1800000000014'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: knowledge-retrieval
+        targetType: llm
+      id: 1800000000030-source-1800000000014-target
+      source: '1800000000030'
+      sourceHandle: source
+      target: '1800000000014'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    # 意图上报：每条分支都额外连一条到「上报意图」。
+    # 为什么不做在「记录对话」里：那个节点在分类器**之前**执行，
+    # 而 Dify 只允许引用上游节点的输出——引用下游的 class_name 取不到值。
+    # 所以用旁路节点，8 个类别各连一条，谁被选中谁就跑这一条。
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: http-request
+      id: 1800000000002-1-1800000000031-target
+      source: '1800000000002'
+      sourceHandle: '1'
+      target: '1800000000031'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: http-request
+      id: 1800000000002-2-1800000000031-target
+      source: '1800000000002'
+      sourceHandle: '2'
+      target: '1800000000031'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: http-request
+      id: 1800000000002-3-1800000000031-target
+      source: '1800000000002'
+      sourceHandle: '3'
+      target: '1800000000031'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: http-request
+      id: 1800000000002-4-1800000000031-target
+      source: '1800000000002'
+      sourceHandle: '4'
+      target: '1800000000031'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: http-request
+      id: 1800000000002-5-1800000000031-target
+      source: '1800000000002'
+      sourceHandle: '5'
+      target: '1800000000031'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: http-request
+      id: 1800000000002-6-1800000000031-target
+      source: '1800000000002'
+      sourceHandle: '6'
+      target: '1800000000031'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: http-request
+      id: 1800000000002-7-1800000000031-target
+      source: '1800000000002'
+      sourceHandle: '7'
+      target: '1800000000031'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: http-request
+      id: 1800000000002-8-1800000000031-target
+      source: '1800000000002'
+      sourceHandle: '8'
+      target: '1800000000031'
+      targetHandle: target
+      type: custom
+      zIndex: 0
     nodes:
     - data:
         selected: false
@@ -473,12 +669,17 @@ workflow:
           name: 转人工
         - id: '7'
           name: 确认提交
+        - id: '8'
+          name: 价保
         instruction: |
           你是电商售后客服的意图识别模块。根据用户消息判断意图，从以下类别中选一个：
 
           - 物流查询：查快递/物流轨迹、东西到哪了、催件、几天没更新、疑似丢件
           - 退款退货：明确表达要办理退款或退货（"我要退款""不想要了""退货"）
           - 换货：换货、换尺码、换颜色、换型号
+          - 价保：自己买完降价了，要求补差价（"刚买就降价了""买贵了""能退差价吗""便宜了 50"）
+            ⚠️ 要**办理**差价 → 价保；只问**条款**（"价保期多久""保价怎么规定的"）→ 通用咨询；
+            明确说"我不想要了，退款" → 退款退货。三者的分界是：要钱 / 要解释 / 要退货。
           - 通用咨询：询问售后规则、时效、流程、费用、发票（"退款多久到账""运费谁出""能退吗"）
           - 投诉情绪：**强负面表达或明确诉求**——辱骂、要求赔偿、扬言差评或曝光，
             以及"太差了""垃圾""骗子""态度差"这类强烈用词。
@@ -495,7 +696,8 @@ workflow:
           判定优先级，按顺序匹配：
           1. 消息只有"好/可以/提交/确认/行/没问题"这类确认词，或者只有 4 位数字 → 确认提交
           2. 提到"换"（换尺码/换颜色/换型号）→ 换货，即使同时提到"退"
-          3. 提到降价、补差价、价保 → 通用咨询
+          3. 提到降价、补差价、价保、保价 → 价保（**不是**通用咨询，也**不是**退款退货：
+             差价金额必须由后端按订单实付价算，不能由客服口头答"支持/不支持"）
           4. 明确表达要办理退款或退货 → 退款退货；只是问规则、流程、时效 → 通用咨询
           5. 出现**强负面用词或明确诉求**（赔偿/曝光/辱骂/"太差了"/"垃圾"）→ 投诉情绪；
              **弱负面表达**（"不太行"/"有点失望"/"体验一般"）→ **不判投诉情绪**，按实际诉求分流
@@ -504,6 +706,9 @@ workflow:
           8. 判不准时选「通用咨询」，让知识库兜底，不要猜成退款
 
           注意：客户只发了订单号或一句"在吗"，选「通用咨询」，并在回答里追问具体诉求。
+          注意：降价了同时说"要退"的，看主诉求——要退全款 → 退款退货；只要差价 → 价保。
+          注意：问价保**条款**（"价保期多久""保价怎么规定的"）归通用咨询，
+          说自己的订单**降价了要补差价**归价保——前者是问解释，后者是要钱。
           注意：确认提交必须是"单纯的确认"，如果客户在确认的同时提了新诉求
           （如"好，但是我想改成换货"），按新诉求分类，不要判成确认提交。
         model:
@@ -601,6 +806,8 @@ workflow:
             全文不超过 150 字，不要用"亲爱的"这类过度称呼。
             语言：只用简体中文。除订单号、工单号、退款单号这类编号外，
             不允许出现任何英文单词或字母缩写（例如 frustration、OK、sorry）。
+            不得出现"知识库""文档""资料""检索""系统""流程""规则码"等内部字眼，
+            也不要说"根据资料显示"，直接给结论。
         - id: p-user
           role: user
           text: |
@@ -720,6 +927,8 @@ workflow:
             需要客户确认才能提交的动作，必须以问句结尾。不超过 150 字。
             语言：只用简体中文。除订单号、工单号、退款单号这类编号外，
             不允许出现任何英文单词或字母缩写。
+            不得出现"知识库""文档""资料""检索""系统""流程""规则码"等内部字眼，
+            也不要说"根据资料显示"，直接给结论。
         - id: p-user
           role: user
           text: |
@@ -836,6 +1045,7 @@ workflow:
             不超过 150 字，不要出现规则码和字段名。
             语言：只用简体中文。除订单号、工单号、退款单号这类编号外，
             不允许出现任何英文单词或字母缩写。
+            不得出现"知识库""文档""资料""检索""系统""流程"等内部字眼，直接给结论。
         - id: p-user
           role: user
           text: |
@@ -886,8 +1096,6 @@ workflow:
     - data:
         dataset_ids:
         - 865a2789-251d-4527-84ce-0f8beca5b1e5
-        - 03e1474a-3b66-4a23-b7fe-d3b23aab23dc
-        - e5f534f3-6ec5-4286-87bf-7387c5bcfbae
         metadata_filtering_mode: disabled
         multiple_retrieval_config:
           reranking_enable: true
@@ -904,16 +1112,16 @@ workflow:
         - query
         retrieval_mode: multiple
         selected: false
-        title: 知识库检索
+        title: 政策与FAQ检索
         type: knowledge-retrieval
       height: 89
       id: '1800000000013'
       position:
-        x: 900
-        y: 820
+        x: 1180
+        y: 620
       positionAbsolute:
-        x: 900
-        y: 820
+        x: 1180
+        y: 620
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -936,16 +1144,23 @@ workflow:
         - id: p-system
           role: system
           text: |
-            你是电商售后客服小岚。请只依据知识库内容回答客户关于售后政策、时效、运费、发票的问题。
-            知识库里没有的内容，不要编造，直接说明无法确认并建议转人工。
+            你是电商售后客服小岚。下面是系统检索到的内部资料，用来支撑你的回答。
+            只依据这些资料回答客户关于售后政策、时效、运费、发票、商品参数的问题。
+            资料里没有的，不要编造，直接说"这个我需要帮您确认一下"，并建议转人工。
             回答不超过 150 字，先给结论，再补充依据。
 
             特别注意：如果客户只是在表达不满、还没提出具体诉求
             （例如"你们这服务不太行""有点失望"），
             **不要查政策、也不要转人工**：先共情一句，然后问他具体遇到什么问题。
             这类客户还没说要办什么事，转人工等于把问题丢给别人，问清楚才是负责。
-            语言：只用简体中文。除订单号、工单号、退款单号这类编号外，
-            不允许出现任何英文单词或字母缩写。
+
+            措辞铁律（违反即事故）：
+            1. **绝对不能向客户提到"知识库""文档""资料""检索""系统""流程""接口"这些内部字眼**，
+               也不要说"根据资料显示""资料中未提及"，直接给结论。
+               客户不知道也不关心我们内部是怎么查的。
+            2. 只说简体中文。除订单号、工单号、退款单号这类编号外，
+               不允许出现任何英文单词或字母缩写。
+            3. 拿不准就说"我帮您确认一下"，不要向客户汇报内部流程。
         - id: p-user
           role: user
           text: '{{#sys.query#}}'
@@ -958,10 +1173,10 @@ workflow:
       height: 110
       id: '1800000000014'
       position:
-        x: 1180
+        x: 1460
         y: 820
       positionAbsolute:
-        x: 1180
+        x: 1460
         y: 820
       selected: false
       sourcePosition: right
@@ -978,10 +1193,10 @@ workflow:
       height: 101
       id: '1800000000015'
       position:
-        x: 1460
+        x: 1740
         y: 820
       positionAbsolute:
-        x: 1460
+        x: 1740
         y: 820
       selected: false
       sourcePosition: right
@@ -1058,6 +1273,7 @@ workflow:
             语言：只用简体中文。除订单号、工单号、退款单号这类编号外，
             不允许出现任何英文单词或字母缩写（尤其是 frustration、sorry 这类
             表达情绪的词，必须写成"沮丧""抱歉"）。
+            不得出现"知识库""文档""资料""检索""系统""流程"等内部字眼，直接给结论。
         - id: p-user
           role: user
           text: |
@@ -1177,6 +1393,7 @@ workflow:
             不超过 150 字，不要出现字段名和规则代码。
             语言：只用简体中文。除订单号、工单号、退款单号这类编号外，
             不允许出现任何英文单词或字母缩写。
+            不得出现"知识库""文档""资料""检索""系统""流程"等内部字眼，直接给结论。
         - id: p-user
           role: user
           text: |
@@ -1361,6 +1578,302 @@ workflow:
       positionAbsolute:
         x: 1460
         y: 1180
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        authorization:
+          config:
+            api_key: dev-local-key
+            header: X-API-Key
+            type: custom
+          type: api-key
+        body:
+          data:
+          - id: b-json-price-protection
+            type: text
+            value: '{"request_type": "price_protection"}'
+          type: json
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 5
+          max_read_timeout: 10
+          max_write_timeout: 10
+        title: 价保资格判定
+        type: http-request
+        url: 'http://host.docker.internal:8000/api/after-sales/eligibility?order_no={{#1800000000003.order_no#}}&session_id={{#1800000000003.session_id#}}'
+        variables: []
+      height: 150
+      id: '1800000000025'
+      position:
+        x: 900
+        y: 1620
+      positionAbsolute:
+        x: 900
+        y: 1620
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.3
+          mode: chat
+          name: qwen-plus
+          provider: langgenius/tongyi/tongyi
+        prompt_template:
+        - id: p-system
+          role: system
+          text: |
+            你是电商售后客服小岚。系统已经完成价保（价格保护）资格判定，
+            你只负责把结论翻译成客户能听懂的话，不要自己做规则判断。
+
+            铁律：
+            1. 只能使用接口返回的数据，不得编造差价金额、天数、时效。
+            2. eligible 为 true：给出明确结论，原样引用可退差价金额（refund_amount）。
+            3. eligible 为 false：说明原因（引用 rule_text），并给出 next_step 里的替代方案。
+            4. 价保和退货是两套规则：除非接口返回里明确写了退货，不要主动说"退货""退款"，
+               就说"补差价"。
+            5. requires_human 为 true：明确说明需要人工核实，不要承诺结果。
+
+            措辞铁律：
+            - 不得出现"知识库""文档""资料""检索""系统""流程""规则码"等内部字眼和字段名，
+              直接给结论。
+            - 只说简体中文。除订单号、退款单号这类编号外，不允许出现任何英文单词或字母缩写。
+            - 不确定就说"我帮您确认一下"，不要向客户汇报内部怎么运作。
+
+            回复结构：结论 → 依据 → 下一步（客户要做什么、我们要做什么）。
+            需要客户确认才能提交的动作，必须以问句结尾。不超过 150 字。
+        - id: p-user
+          role: user
+          text: |
+            客户问题：{{#sys.query#}}
+            订单号：{{#1800000000003.order_no#}}
+            价保判定结果：{{#1800000000025.body#}}
+            请根据以上真实数据回答。
+        selected: false
+        title: 生成价保方案
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 110
+      id: '1800000000026'
+      position:
+        x: 1180
+        y: 1620
+      positionAbsolute:
+        x: 1180
+        y: 1620
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        answer: '{{#1800000000026.text#}}'
+        selected: false
+        title: 回复：价保
+        type: answer
+        variables: []
+      height: 101
+      id: '1800000000027'
+      position:
+        x: 1460
+        y: 1620
+      positionAbsolute:
+        x: 1460
+        y: 1620
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        classes:
+        - id: '1'
+          name: 政策规则
+        - id: '2'
+          name: 商品参数
+        - id: '3'
+          name: 流程时效
+        instruction: |
+          客户的这个问题已经确定属于"通用咨询"，你要判断它该查哪个知识库。
+          从以下三类里选一个：
+
+          - 政策规则：退换货政策、时效、运费、发票、价保、品类限制、质量问题怎么举证
+            （"退款多久到账""运费谁出""内衣能退吗""7 天无理由怎么算"）
+          - 商品参数：具体某个商品本身的规格、材质、尺寸、功率、保养方式、风险提示
+            （"这个材质是什么""瑜伽垫怎么清洗""空气炸锅功率多少"）
+          - 流程时效：内部处理流程、时限要求、升级条件、话术标准
+            （"超期退货的流程是什么""催办时限""要求三倍赔偿怎么回复"）
+
+          判定优先级，按顺序匹配：
+          1. 明确提到某个具体商品（品牌 + 品名），并且问的是它自己的参数或保养 → 商品参数
+          2. 问"流程""时限""多久处理完""怎么升级""怎么回复" → 流程时效
+          3. 其余涉及规则、时效、费用、发票、价保的 → 政策规则
+          4. 判不准时选「政策规则」——它覆盖面最广，里面有 500 条 FAQ 兜底
+        model:
+          completion_params:
+            temperature: 0
+          mode: chat
+          name: qwen-plus
+          provider: langgenius/tongyi/tongyi
+        query_variable_selector:
+        - sys
+        - query
+        selected: false
+        title: 咨询类型分流
+        type: question-classifier
+        vision:
+          enabled: false
+      height: 330
+      id: '1800000000028'
+      position:
+        x: 900
+        y: 820
+      positionAbsolute:
+        x: 900
+        y: 820
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        dataset_ids:
+        - 03e1474a-3b66-4a23-b7fe-d3b23aab23dc
+        metadata_filtering_mode: disabled
+        multiple_retrieval_config:
+          reranking_enable: true
+          reranking_mode: reranking_model
+          reranking_model:
+            model: qwen3-rerank
+            provider: langgenius/tongyi/tongyi
+          score_threshold: 0.5
+          top_k: 4
+          weights: null
+        query_attachment_selector: []
+        query_variable_selector:
+        - sys
+        - query
+        retrieval_mode: multiple
+        selected: false
+        title: 产品手册检索
+        type: knowledge-retrieval
+      height: 89
+      id: '1800000000029'
+      position:
+        x: 1180
+        y: 820
+      positionAbsolute:
+        x: 1180
+        y: 820
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        dataset_ids:
+        - e5f534f3-6ec5-4286-87bf-7387c5bcfbae
+        metadata_filtering_mode: disabled
+        multiple_retrieval_config:
+          reranking_enable: true
+          reranking_mode: reranking_model
+          reranking_model:
+            model: qwen3-rerank
+            provider: langgenius/tongyi/tongyi
+          score_threshold: 0.5
+          top_k: 4
+          weights: null
+        query_attachment_selector: []
+        query_variable_selector:
+        - sys
+        - query
+        retrieval_mode: multiple
+        selected: false
+        title: 流程与话术检索
+        type: knowledge-retrieval
+      height: 89
+      id: '1800000000030'
+      position:
+        x: 1180
+        y: 1020
+      positionAbsolute:
+        x: 1180
+        y: 1020
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        authorization:
+          config:
+            api_key: dev-local-key
+            header: X-API-Key
+            type: custom
+          type: api-key
+        body:
+          data:
+          - id: f-intent-session
+            key: session_id
+            type: text
+            value: '{{#1800000000003.session_id#}}'
+          - id: f-intent-value
+            key: intent
+            type: text
+            value: '{{#1800000000002.class_name#}}'
+          type: x-www-form-urlencoded
+        desc: 把分类器判出的意图回报给后端，用于算意图准确率
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 2
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 5
+          max_read_timeout: 10
+          max_write_timeout: 10
+        title: 上报意图
+        type: http-request
+        url: http://host.docker.internal:8000/api/intent
+        variables: []
+      height: 120
+      id: '1800000000031'
+      position:
+        x: 900
+        y: 1880
+      positionAbsolute:
+        x: 900
+        y: 1880
       selected: false
       sourcePosition: right
       targetPosition: left

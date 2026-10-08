@@ -42,3 +42,9 @@
 {"id":"K42","input":"有点失望","expect_class":"通用咨询","note":"弱负面同上"}
 {"id":"K43","input":"体验一般般吧","expect_class":"通用咨询","note":"弱负面同上"}
 {"id":"K44","input":"你们客服态度太差了","expect_class":"投诉情绪","note":"强负面：明确指责具体对象，应转人工"}
+{"id":"K45","input":"刚买完就降了五十块","expect_class":"价保","note":"口语省略主语，说的是自己买贵了"}
+{"id":"K46","input":"买贵了，能找你们退点钱吗","expect_class":"价保","note":"『退点钱』指差价，不是退货"}
+{"id":"K47","input":"昨天才下的单今天就便宜了","expect_class":"价保","note":"隐含时间线，仍是价保诉求"}
+{"id":"K48","input":"降价了，退我差价","expect_class":"价保","note":"最直白的价保说法"}
+{"id":"K49","input":"价保几天内有效啊","expect_class":"通用咨询","note":"问条文，不是要办理"}
+{"id":"K50","input":"便宜了这么多，我不要了退了吧","expect_class":"退款退货","note":"易混项：要退全款 → 退款退货"}

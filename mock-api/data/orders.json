@@ -977,7 +977,8 @@
     "price_drop": {
       "current_price": 299.0,
       "diff": 50.0,
-      "changed_days_ago": 1
+      "changed_days_ago": 1,
+      "source": "official"
     }
   },
   "2024093012015": {
@@ -1022,7 +1023,54 @@
     "price_drop": {
       "current_price": 199.0,
       "diff": 60.0,
-      "changed_days_ago": 2
+      "changed_days_ago": 2,
+      "source": "official"
+    }
+  },
+  "2024093012019": {
+    "order_no": "2024093012019",
+    "scenario": "签收 3 天，但降价来自限时秒杀（不参与价保）",
+    "status": "已签收",
+    "buyer_masked": "138****2019",
+    "phone_tail": "2019",
+    "paid_amount": 129.0,
+    "paid_days_ago": 7,
+    "shipped_days_ago": 5,
+    "signed_days_ago": 3,
+    "items": [
+      {
+        "sku": "YD-001",
+        "name": "轻岚优选 瑜伽垫（珊瑚粉）",
+        "qty": 1,
+        "amount": 129.0,
+        "category": "运动户外",
+        "warranty": "签收后 7 天内无理由退货（未使用）；3 个月内质量问题包换",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "顺丰速运",
+      "tracking_no": "SF1212121212",
+      "state": "已签收",
+      "last_update_hours_ago": 72,
+      "traces": [
+        {
+          "hours_ago": 72,
+          "text": "快件已签收，签收人：本人"
+        }
+      ]
+    },
+    "price_drop": {
+      "current_price": 159.0,
+      "diff": 40.0,
+      "changed_days_ago": 1,
+      "source": "flash_sale"
     }
   }
 }

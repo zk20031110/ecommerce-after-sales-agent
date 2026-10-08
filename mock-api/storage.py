@@ -175,6 +175,27 @@ def add_message(conn: sqlite3.Connection, session_id: str, role: str, content: s
     conn.commit()
 
 
+def set_last_message_intent(conn: sqlite3.Connection, session_id: str, intent: str) -> bool:
+    """把这一轮客户消息的意图补写上去（分类器判完之后才拿得到）。
+
+    为什么是"补写最后一条"而不是插入时带上：分类器在「记录对话」之后才跑，
+    意图分两步才拿到。补写能保证**一轮对话只有一条客户消息**，
+    不会因为多打了一个上报点就多出一条。
+
+    这一列的唯一用途是让"意图识别准确率"有实测数据（tools/eval_intent.py）。
+    """
+    if not intent:
+        return False
+    row = conn.execute(
+        "SELECT id FROM messages WHERE session_id = ? AND role = 'customer' "
+        "ORDER BY id DESC LIMIT 1", (session_id,)).fetchone()
+    if not row:
+        return False
+    conn.execute("UPDATE messages SET intent = ? WHERE id = ?", (intent, row["id"]))
+    conn.commit()
+    return True
+
+
 def set_dify_conversation(conn: sqlite3.Connection, session_id: str, cid: str) -> None:
     """记下"Dify 的对话 ID"，重启后还能把两边对上。"""
     now = _now()
