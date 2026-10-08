@@ -173,8 +173,36 @@ def selfcheck(base: str, api: str, app_key: str, api_key: str) -> int:
         print("\n先把后端起起来：cd mock-api && python -m uvicorn main:app --port 8000")
         return 2
 
+    # 1.5) 后端跑的是不是新版代码 + 新数据
+    #      后端启动时把 orders.json 读进内存，改了数据不重启就还是旧的。
+    try:
+        m = get_json(f"{api}/api/metrics", {"X-API-Key": api_key})
+        n = m.get("orders_loaded")
+        print(f"后端订单数      : {n}（新版应为 24）")
+        stale = []
+        if n != 24:
+            stale.append("订单数据是旧的（少一个秒杀场景订单）")
+        pp = post_json(
+            f"{api}/api/after-sales/eligibility?order_no=2024093012019&session_id=probe-backend",
+            {"request_type": "price_protection"}, {"X-API-Key": api_key})
+        decision = pp.get("decision")
+        print(f"秒杀单价保判定  : {decision}")
+        if decision != "price_protection_excluded":
+            stale.append("价保还没按降价来源判断（后端代码是旧的）")
+        if stale:
+            print("\n! " + "；".join(stale))
+            print("  后端是启动时读数据、启动时加载代码的，改了必须重启：")
+            print("  Ctrl+C 停掉，然后 cd mock-api && python -m uvicorn main:app --port 8000")
+            return 2
+    except urllib.error.HTTPError as e:
+        print(f"后端版本探测    : × HTTP {e.code}")
+    except Exception as e:  # noqa: BLE001
+        print(f"后端版本探测    : × {e}")
+
     # 2) 先判断 Dify 里跑的是不是新版 DSL：
     #    新版把"降价"接到了价保接口，旧版会走知识库并答"不支持退差价"。
+    print("\n正在调 Dify 探测新版 DSL（要跑一次真实工作流，约 5~15 秒，别急着关）...",
+          flush=True)
     try:
         probe_out = post_json(
             f"{base}/chat-messages",
@@ -182,7 +210,7 @@ def selfcheck(base: str, api: str, app_key: str, api_key: str) -> int:
              "conversation_id": "", "user": f"probe-dsl-{int(time.time())}"},
             {"Authorization": f"Bearer {app_key}"})
         answer = str(probe_out.get("answer", ""))
-        print(f"\n新版 DSL 探测（价保问题）：")
+        print("新版 DSL 探测（价保问题）：")
         print(f"    {answer[:120].replace(chr(10), ' ')}")
         if "知识库" in answer or "不支持" in answer:
             print("    → 这是**旧版**行为：降价被丢给了知识库。")
@@ -193,6 +221,7 @@ def selfcheck(base: str, api: str, app_key: str, api_key: str) -> int:
         print(f"\n新版 DSL 探测失败：{e}")
 
     # 3) 真跑一次工作流
+    print("\n正在跑一次完整对话，检查消息有没有落到后端（再等几秒）...", flush=True)
     conv = f"eval-check-{int(time.time())}"
     try:
         cid = ask_workflow(base, app_key, PROBE, conv)
