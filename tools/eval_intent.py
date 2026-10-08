@@ -37,6 +37,13 @@ import urllib.request
 from datetime import datetime
 from pathlib import Path
 
+# Windows 控制台默认是 GBK，打印 emoji（用例 C28 就是 😊）会抛 UnicodeEncodeError
+# 把整轮评测打断。把编不出的字符替换掉就行——报告文件始终按 UTF-8 写，不受影响。
+try:
+    sys.stdout.reconfigure(errors="replace")
+except Exception:  # noqa: BLE001
+    pass
+
 ROOT = Path(__file__).resolve().parent.parent
 REPORT_DIR = ROOT / "tests" / "reports"
 
