@@ -360,6 +360,7 @@ python tools/validate_assets.py # DSL 与评测集规范校验
 | W15 | **被问"花多少钱、怎么上线"答不上来** | 只有功能文档，没有成本和上线方案 | 补三份：成本与 ROI 测算、上线与灰度方案、方案选型对比 | 文档补齐到 11 份 |
 | W15 | 知识库块数口径不一致 | README 写 1908 块，`chunks.jsonl` 实际 1330 块 | 统一口径，并把"为什么从 1908 变成 1330"记下来 | 口径一致 |
 | W15 | 项目只在本地，没法给面试官看 | 没有版本管理 | 初始化 Git 仓库 + `.gitattributes` 统一换行符，推上 GitHub | 首个提交 53 个文件 |
+| W15 | 推送报 `Connection was reset` | Git 不走系统代理，浏览器能打开 GitHub 不代表 Git 能推 | 给本仓库配置 `http.proxy` 指向代理软件的混合端口 | 推送成功 |
 
 ---
 
@@ -384,13 +385,21 @@ python tools/validate_assets.py # DSL 与评测集规范校验
 
 ## 十二、上传到 GitHub
 
-本地仓库已经建好（分支 `main`，首个提交 53 个文件），剩下两步：**在 GitHub 建仓库 → 推送**。
+已推送成功：**https://github.com/zk20031110/ecommerce-after-sales-agent**
+
+本地仓库状态：分支 `main`、首个提交 53 个文件、已关联 `origin` 并建立跟踪关系。
+仓库级已配置 Git 代理（`127.0.0.1:8902`）——**Git 不会自动走系统代理或 VPN**，
+这是本项目真实踩过的坑，浏览器能打开 GitHub 不代表 Git 能推。
 
 ```powershell
 cd C:\Users\22503\Desktop\test
-git remote add origin https://github.com/<你的用户名>/ecommerce-after-sales-agent.git
-git push -u origin main
+
+# 以后每次改完，三行口诀
+git status --short
+git add -A
+git commit -m "docs: 说明这次改了什么"
+git push
 ```
 
-完整的操作步骤、上传前检查清单和 6 个常见报错的解决办法见
+完整的操作步骤、上传前检查清单和常见报错对照表见
 **[docs/11-GitHub上传指南.md](docs/11-GitHub上传指南.md)**。

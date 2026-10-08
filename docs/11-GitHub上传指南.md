@@ -5,8 +5,8 @@
 | 项 | 内容 |
 |---|---|
 | 适用对象 | 第一次把项目传上 GitHub 的人（本文按本项目实际情况写，命令可直接复制） |
-| 当前状态 | 本地仓库已建好、已提交，**只差"建远程仓库 + 推送"** |
-| 前置工具 | Git for Windows（本机已装 2.55.0） |
+| 当前状态 | **已完成**：本地仓库已提交，远程已关联，`main` 已推送成功 |
+| 前置工具 | Git for Windows（本机已装 2.55.0）+ 代理软件（本项目用 127.0.0.1:8902） |
 
 ---
 
@@ -19,8 +19,14 @@
 | 初始化仓库 | ✅ 已完成 | 分支 `main` |
 | 检查密钥与大文件 | ✅ 已完成 | 无密钥入库，大文件被 `.gitignore` 挡住 |
 | 首次提交 | ✅ 已完成 | 53 个文件、12325 行 |
-| **创建 GitHub 远程仓库** | ❌ 待做 | 在网页上点几下 |
-| **推送到 GitHub** | ❌ 待做 | 两条命令 |
+| 创建 GitHub 远程仓库 | ✅ 已完成 | `zk20031110/ecommerce-after-sales-agent` |
+| 关联远程地址 | ✅ 已完成 | `git remote add origin ...` |
+| 配置 Git 代理 | ✅ 已完成 | 本仓库走 `127.0.0.1:8902`（原因见第九节） |
+| **推送到 GitHub** | ✅ 已完成 | `main -> main`，并已建立跟踪关系 |
+
+**仓库地址**：https://github.com/zk20031110/ecommerce-after-sales-agent
+
+下面的步骤保留完整流程，用于你以后别的项目照着做。
 
 ---
 
@@ -145,6 +151,7 @@ git push                    # 4. 推上去
 | `! [rejected] main -> main (fetch first)` | 远程仓库有本地没有的提交（通常是建仓库时勾了 README） | `git pull --rebase origin main` 后再 `git push` |
 | `Support for password authentication was removed` | 你在用账号密码推送，GitHub 早就不允许了 | 让它走浏览器登录（Git Credential Manager），或创建 Personal Access Token 当密码 |
 | `RPC failed` / `file is 105 MB; exceeds GitHub's limit` | 有大文件被提交了 | 先从暂存区移除（`git rm --cached <文件>`），补进 `.gitignore`，再重新提交 |
+| `Recv failure: Connection was reset` | Git 不会自动走系统代理或 VPN，浏览器能开不代表 Git 能推 | 给 Git 配置代理端口，见**第八节** |
 | `git status` 里中文文件名显示成一堆 `\346\234\200` | Git 默认把非 ASCII 文件名转义显示，只是**显示**问题 | `git config --global core.quotepath false` |
 | `detected dubious ownership` | 仓库目录属于另一个 Windows 账号，Git 出于安全拒绝操作 | `git config --global --add safe.directory C:/Users/22503/Desktop/test` |
 
@@ -164,7 +171,47 @@ git push                    # 4. 推上去
 
 ---
 
-## 八、两个慎用命令（知道就行，别轻易执行）
+## 八、如果你在中国大陆用代理（本项目真实踩过的坑）
+
+### 报错长这样
+
+```text
+fatal: unable to access 'https://github.com/xxx/yyy.git/': Recv failure: Connection was reset
+```
+
+### 原因
+
+**Git 不会自动使用系统代理，也不会自动走 VPN 客户端的分流规则。**
+你的浏览器能打开 GitHub，不代表 Git 能——它们用的是两套网络设置。
+
+### 解决：把 Git 指到你代理软件的端口
+
+代理软件里那个"混合代理端口"（本项目是 **8902**）就是给这种情况用的：
+
+```powershell
+cd C:\Users\22503\Desktop\test
+
+# 只对当前仓库生效（推荐先这样）
+git config http.proxy http://127.0.0.1:8902
+git config https.proxy http://127.0.0.1:8902
+
+# 验证：能列出远程引用就说明通了（空仓库不显示内容，但不会报错）
+git ls-remote origin
+```
+
+如果想让**所有**仓库都走代理，把 `git config` 换成 `git config --global`。
+
+### 两个配套提醒
+
+| 情况 | 怎么办 |
+|---|---|
+| 代理软件没开，Git 报连不上 | 关掉代理配置：`git config --unset http.proxy` 和 `git config --unset https.proxy` |
+| `http://` 不行，想换 socks5 | `git config http.proxy socks5://127.0.0.1:8902`（混合端口两种协议都支持） |
+| 你怎么看自己代理的端口 | 打开代理软件的设置页，找"混合代理端口"或"HTTP 端口" |
+
+---
+
+## 九、两个慎用命令（知道就行，别轻易执行）
 
 | 命令 | 后果 |
 |---|---|
