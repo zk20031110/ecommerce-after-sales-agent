@@ -1,0 +1,1028 @@
+{
+  "2024091288765": {
+    "order_no": "2024091288765",
+    "scenario": "签收 3 天，7 天无理由期内（物流查询 + 可退双场景）",
+    "status": "已签收",
+    "buyer_masked": "138****8765",
+    "phone_tail": "8765",
+    "paid_amount": 269.0,
+    "paid_days_ago": 10,
+    "shipped_days_ago": 8,
+    "signed_days_ago": 3,
+    "items": [
+      {
+        "sku": "FS-006",
+        "name": "轻岚优选 轻羽绒外套（米白）",
+        "qty": 1,
+        "amount": 269.0,
+        "category": "服饰",
+        "warranty": "签收后 7 天内无理由退货（吊牌完整）；30 天内质量问题包退换",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "顺丰速运",
+      "tracking_no": "SF4433221188",
+      "state": "已签收",
+      "last_update_hours_ago": 72,
+      "traces": [
+        {
+          "hours_ago": 72,
+          "text": "快件已签收，签收人：本人"
+        },
+        {
+          "hours_ago": 120,
+          "text": "快件已到达杭州西湖区网点，正在派送"
+        },
+        {
+          "hours_ago": 192,
+          "text": "快件已发出，下一站杭州转运中心"
+        }
+      ]
+    },
+    "price_drop": null
+  },
+  "2024093012001": {
+    "order_no": "2024093012001",
+    "scenario": "已发货在途，物流正常更新（对照组）",
+    "status": "运输中",
+    "buyer_masked": "138****2001",
+    "phone_tail": "2001",
+    "paid_amount": 579.0,
+    "paid_days_ago": 2,
+    "shipped_days_ago": 1,
+    "signed_days_ago": null,
+    "items": [
+      {
+        "sku": "XX-010",
+        "name": "轻岚优选 小白鞋（白色）",
+        "qty": 1,
+        "amount": 579.0,
+        "category": "鞋靴",
+        "warranty": "签收后 7 天内无理由退货（未穿着、鞋底无磨损）；90 天内开胶断底包换",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "中通快递",
+      "tracking_no": "ZT2200113344",
+      "state": "运输中",
+      "last_update_hours_ago": 5,
+      "traces": [
+        {
+          "hours_ago": 5,
+          "text": "快件已到达上海转运中心"
+        },
+        {
+          "hours_ago": 28,
+          "text": "快件已发出，下一站上海转运中心"
+        }
+      ]
+    },
+    "price_drop": null
+  },
+  "2024092004455": {
+    "order_no": "2024092004455",
+    "scenario": "在途但物流停滞 52 小时（异常件）",
+    "status": "运输中",
+    "buyer_masked": "138****4455",
+    "phone_tail": "4455",
+    "paid_amount": 579.0,
+    "paid_days_ago": 4,
+    "shipped_days_ago": 3,
+    "signed_days_ago": null,
+    "items": [
+      {
+        "sku": "XX-010",
+        "name": "轻岚优选 小白鞋（白色）",
+        "qty": 1,
+        "amount": 579.0,
+        "category": "鞋靴",
+        "warranty": "签收后 7 天内无理由退货（未穿着、鞋底无磨损）；90 天内开胶断底包换",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "圆通速递",
+      "tracking_no": "YT5566778899",
+      "state": "运输中",
+      "last_update_hours_ago": 52,
+      "traces": [
+        {
+          "hours_ago": 52,
+          "text": "快件已到达郑州转运中心"
+        },
+        {
+          "hours_ago": 72,
+          "text": "快件已发出，下一站郑州转运中心"
+        }
+      ]
+    },
+    "price_drop": null
+  },
+  "2024093012002": {
+    "order_no": "2024093012002",
+    "scenario": "刚下单未发货（催发货场景）",
+    "status": "待发货",
+    "buyer_masked": "138****2002",
+    "phone_tail": "2002",
+    "paid_amount": 238.0,
+    "paid_days_ago": 0,
+    "shipped_days_ago": null,
+    "signed_days_ago": null,
+    "items": [
+      {
+        "sku": "JJ-001",
+        "name": "轻岚优选 全棉四件套（豆沙粉）",
+        "qty": 2,
+        "amount": 238.0,
+        "category": "家居",
+        "warranty": "签收后 7 天内无理由退货（不影响二次销售）；1 年内非人为损坏包换",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "",
+      "tracking_no": "",
+      "state": "待发货",
+      "last_update_hours_ago": 2,
+      "traces": []
+    },
+    "price_drop": null
+  },
+  "2024093012003": {
+    "order_no": "2024093012003",
+    "scenario": "物流丢件（快递公司已确认）",
+    "status": "运输中",
+    "buyer_masked": "138****2003",
+    "phone_tail": "2003",
+    "paid_amount": 99.0,
+    "paid_days_ago": 12,
+    "shipped_days_ago": 10,
+    "signed_days_ago": null,
+    "items": [
+      {
+        "sku": "SM-002",
+        "name": "轻岚优选 充电宝（银色）",
+        "qty": 1,
+        "amount": 99.0,
+        "category": "数码配件",
+        "warranty": "签收后 7 天内无理由退货；1 年内非人为故障换新（耳机电池 6 个月）",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "韵达快递",
+      "tracking_no": "YD9900112233",
+      "state": "异常-疑似丢件",
+      "last_update_hours_ago": 168,
+      "traces": [
+        {
+          "hours_ago": 168,
+          "text": "快件在郑州转运中心滞留，疑似丢件，已发起查询"
+        }
+      ]
+    },
+    "price_drop": null
+  },
+  "2024093012016": {
+    "order_no": "2024093012016",
+    "scenario": "三件商品分批发货，只到了两件（多商品 + 部分签收）",
+    "status": "部分签收",
+    "buyer_masked": "138****2016",
+    "phone_tail": "2016",
+    "paid_amount": 2227.0,
+    "paid_days_ago": 7,
+    "shipped_days_ago": 5,
+    "signed_days_ago": 2,
+    "items": [
+      {
+        "sku": "JJ-008",
+        "name": "轻岚优选 免安装置物架（原木色）",
+        "qty": 1,
+        "amount": 669.0,
+        "category": "家居",
+        "warranty": "签收后 7 天内无理由退货（不影响二次销售）；1 年内非人为损坏包换",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      },
+      {
+        "sku": "JJ-009",
+        "name": "轻岚优选 落地衣帽架（原木色）",
+        "qty": 1,
+        "amount": 739.0,
+        "category": "家居",
+        "warranty": "签收后 7 天内无理由退货（不影响二次销售）；1 年内非人为损坏包换",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      },
+      {
+        "sku": "JJ-010",
+        "name": "轻岚优选 毛绒地毯（原木色）",
+        "qty": 1,
+        "amount": 819.0,
+        "category": "家居",
+        "warranty": "签收后 7 天内无理由退货（不影响二次销售）；1 年内非人为损坏包换",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "申通快递",
+      "tracking_no": "ST5151515151",
+      "state": "部分签收",
+      "last_update_hours_ago": 30,
+      "traces": [
+        {
+          "hours_ago": 30,
+          "text": "包裹 1/3 已签收，其余在途"
+        },
+        {
+          "hours_ago": 54,
+          "text": "包裹已从杭州仓发出，共 3 个包裹"
+        }
+      ]
+    },
+    "price_drop": null
+  },
+  "2024093012017": {
+    "order_no": "2024093012017",
+    "scenario": "显示已签收但客户未收到（冒名签收）",
+    "status": "已签收",
+    "buyer_masked": "138****2017",
+    "phone_tail": "2017",
+    "paid_amount": 339.0,
+    "paid_days_ago": 6,
+    "shipped_days_ago": 4,
+    "signed_days_ago": 1,
+    "items": [
+      {
+        "sku": "XX-005",
+        "name": "轻岚优选 马丁靴（米色）",
+        "qty": 1,
+        "amount": 339.0,
+        "category": "鞋靴",
+        "warranty": "签收后 7 天内无理由退货（未穿着、鞋底无磨损）；90 天内开胶断底包换",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "韵达快递",
+      "tracking_no": "YD6161616161",
+      "state": "已签收",
+      "last_update_hours_ago": 20,
+      "traces": [
+        {
+          "hours_ago": 20,
+          "text": "快件已签收，签收人：门卫代收"
+        },
+        {
+          "hours_ago": 28,
+          "text": "快件正在派送"
+        }
+      ]
+    },
+    "price_drop": null
+  },
+  "2024093012004": {
+    "order_no": "2024093012004",
+    "scenario": "签收 7 天整（无理由期限边界，应可退）",
+    "status": "已签收",
+    "buyer_masked": "138****2004",
+    "phone_tail": "2004",
+    "paid_amount": 169.0,
+    "paid_days_ago": 12,
+    "shipped_days_ago": 10,
+    "signed_days_ago": 7,
+    "items": [
+      {
+        "sku": "FS-003",
+        "name": "轻岚优选 宽松针织开衫（米白）",
+        "qty": 1,
+        "amount": 169.0,
+        "category": "服饰",
+        "warranty": "签收后 7 天内无理由退货（吊牌完整）；30 天内质量问题包退换",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "顺丰速运",
+      "tracking_no": "SF1122334455",
+      "state": "已签收",
+      "last_update_hours_ago": 168,
+      "traces": [
+        {
+          "hours_ago": 168,
+          "text": "快件已签收，签收人：本人"
+        }
+      ]
+    },
+    "price_drop": null
+  },
+  "2024093012005": {
+    "order_no": "2024093012005",
+    "scenario": "签收 8 天（刚过无理由期限，应转人工）",
+    "status": "已签收",
+    "buyer_masked": "138****2005",
+    "phone_tail": "2005",
+    "paid_amount": 239.0,
+    "paid_days_ago": 14,
+    "shipped_days_ago": 11,
+    "signed_days_ago": 8,
+    "items": [
+      {
+        "sku": "FS-005",
+        "name": "轻岚优选 直筒牛仔裤（酒红）",
+        "qty": 1,
+        "amount": 239.0,
+        "category": "服饰",
+        "warranty": "签收后 7 天内无理由退货（吊牌完整）；30 天内质量问题包退换",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "中通快递",
+      "tracking_no": "ZT3344556677",
+      "state": "已签收",
+      "last_update_hours_ago": 192,
+      "traces": [
+        {
+          "hours_ago": 192,
+          "text": "快件已签收，签收人：本人"
+        }
+      ]
+    },
+    "price_drop": null
+  },
+  "2024090511233": {
+    "order_no": "2024090511233",
+    "scenario": "签收 40 天（严重超期，必须转人工）",
+    "status": "已签收",
+    "buyer_masked": "138****1233",
+    "phone_tail": "1233",
+    "paid_amount": 79.0,
+    "paid_days_ago": 46,
+    "shipped_days_ago": 44,
+    "signed_days_ago": 40,
+    "items": [
+      {
+        "sku": "CJ-002",
+        "name": "轻岚优选 不粘炒锅（黑色）",
+        "qty": 1,
+        "amount": 79.0,
+        "category": "厨具",
+        "warranty": "签收后 7 天内无理由退货（未使用）；1 年内开裂、脱柄等质量问题包换",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "中通快递",
+      "tracking_no": "ZT7788990011",
+      "state": "已签收",
+      "last_update_hours_ago": 960,
+      "traces": [
+        {
+          "hours_ago": 960,
+          "text": "快件已签收，签收人：前台代收"
+        }
+      ]
+    },
+    "price_drop": null
+  },
+  "2024092107788": {
+    "order_no": "2024092107788",
+    "scenario": "签收 2 天但商品已使用（不支持无理由）",
+    "status": "已签收",
+    "buyer_masked": "138****7788",
+    "phone_tail": "7788",
+    "paid_amount": 139.0,
+    "paid_days_ago": 6,
+    "shipped_days_ago": 5,
+    "signed_days_ago": 2,
+    "items": [
+      {
+        "sku": "CJ-004",
+        "name": "轻岚优选 硅胶铲勺套装（白色）",
+        "qty": 1,
+        "amount": 139.0,
+        "category": "厨具",
+        "warranty": "签收后 7 天内无理由退货（未使用）；1 年内开裂、脱柄等质量问题包换",
+        "used": true,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "韵达快递",
+      "tracking_no": "YD1122334455",
+      "state": "已签收",
+      "last_update_hours_ago": 48,
+      "traces": [
+        {
+          "hours_ago": 48,
+          "text": "快件已签收，签收人：本人"
+        }
+      ]
+    },
+    "price_drop": null
+  },
+  "2024093012006": {
+    "order_no": "2024093012006",
+    "scenario": "贴身用品（内衣），签收后不支持无理由",
+    "status": "已签收",
+    "buyer_masked": "138****2006",
+    "phone_tail": "2006",
+    "paid_amount": 78.0,
+    "paid_days_ago": 5,
+    "shipped_days_ago": 4,
+    "signed_days_ago": 1,
+    "items": [
+      {
+        "sku": "MZ-001",
+        "name": "轻岚优选 氨基酸洁面（默认）",
+        "qty": 2,
+        "amount": 78.0,
+        "category": "美妆个护",
+        "warranty": "签收后 7 天内无理由退货（未开封、包装完整）；质量问题 30 天内包退换",
+        "used": false,
+        "intimate": true,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "圆通速递",
+      "tracking_no": "YT6677889900",
+      "state": "已签收",
+      "last_update_hours_ago": 24,
+      "traces": [
+        {
+          "hours_ago": 24,
+          "text": "快件已签收，签收人：快递柜"
+        }
+      ]
+    },
+    "price_drop": null
+  },
+  "2024093012007": {
+    "order_no": "2024093012007",
+    "scenario": "定制商品（刻字），不支持无理由",
+    "status": "已签收",
+    "buyer_masked": "138****2007",
+    "phone_tail": "2007",
+    "paid_amount": 899.0,
+    "paid_days_ago": 9,
+    "shipped_days_ago": 7,
+    "signed_days_ago": 4,
+    "items": [
+      {
+        "sku": "JJ-011",
+        "name": "轻岚优选 陶瓷花瓶（米白）",
+        "qty": 1,
+        "amount": 899.0,
+        "category": "家居",
+        "warranty": "签收后 7 天内无理由退货（不影响二次销售）；1 年内非人为损坏包换",
+        "used": false,
+        "intimate": false,
+        "custom_made": true,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "顺丰速运",
+      "tracking_no": "SF5566778899",
+      "state": "已签收",
+      "last_update_hours_ago": 96,
+      "traces": [
+        {
+          "hours_ago": 96,
+          "text": "快件已签收，签收人：本人"
+        }
+      ]
+    },
+    "price_drop": null
+  },
+  "2024093012008": {
+    "order_no": "2024093012008",
+    "scenario": "食品类，签收 3 天（食品安全不支持无理由）",
+    "status": "已签收",
+    "buyer_masked": "138****2008",
+    "phone_tail": "2008",
+    "paid_amount": 29.0,
+    "paid_days_ago": 6,
+    "shipped_days_ago": 5,
+    "signed_days_ago": 3,
+    "items": [
+      {
+        "sku": "SP-001",
+        "name": "轻岚优选 坚果礼盒（默认）",
+        "qty": 1,
+        "amount": 29.0,
+        "category": "食品",
+        "warranty": "食品类商品不支持无理由退货（食品安全要求）；质量问题 7 天内包退换",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": true,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "中通快递",
+      "tracking_no": "ZT5566778899",
+      "state": "已签收",
+      "last_update_hours_ago": 72,
+      "traces": [
+        {
+          "hours_ago": 72,
+          "text": "快件已签收，签收人：本人"
+        }
+      ]
+    },
+    "price_drop": null
+  },
+  "2024093012009": {
+    "order_no": "2024093012009",
+    "scenario": "数码产品已激活，不支持无理由",
+    "status": "已签收",
+    "buyer_masked": "138****2009",
+    "phone_tail": "2009",
+    "paid_amount": 59.0,
+    "paid_days_ago": 5,
+    "shipped_days_ago": 4,
+    "signed_days_ago": 2,
+    "items": [
+      {
+        "sku": "SM-001",
+        "name": "轻岚优选 蓝牙耳机（透明）",
+        "qty": 1,
+        "amount": 59.0,
+        "category": "数码配件",
+        "warranty": "签收后 7 天内无理由退货；1 年内非人为故障换新（耳机电池 6 个月）",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": true,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "顺丰速运",
+      "tracking_no": "SF7788990011",
+      "state": "已签收",
+      "last_update_hours_ago": 48,
+      "traces": [
+        {
+          "hours_ago": 48,
+          "text": "快件已签收，签收人：本人"
+        }
+      ]
+    },
+    "price_drop": null
+  },
+  "2024093012010": {
+    "order_no": "2024093012010",
+    "scenario": "质量问题，签收 15 天（走质保通道，不受 7 天限制）",
+    "status": "已签收",
+    "buyer_masked": "138****2010",
+    "phone_tail": "2010",
+    "paid_amount": 639.0,
+    "paid_days_ago": 18,
+    "shipped_days_ago": 16,
+    "signed_days_ago": 15,
+    "items": [
+      {
+        "sku": "XD-006",
+        "name": "轻岚优选 空气炸锅（薄荷绿）",
+        "qty": 1,
+        "amount": 639.0,
+        "category": "小家电",
+        "warranty": "签收后 7 天内无理由退货（未使用）；整机 1 年保修，主要部件 2 年",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": true
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "圆通速递",
+      "tracking_no": "YT2233445566",
+      "state": "已签收",
+      "last_update_hours_ago": 360,
+      "traces": [
+        {
+          "hours_ago": 360,
+          "text": "快件已签收，签收人：本人"
+        }
+      ]
+    },
+    "price_drop": null
+  },
+  "2024093012011": {
+    "order_no": "2024093012011",
+    "scenario": "大额多商品订单（两件合计超 500，需主管审核）",
+    "status": "已签收",
+    "buyer_masked": "138****2011",
+    "phone_tail": "2011",
+    "paid_amount": 1098.0,
+    "paid_days_ago": 20,
+    "shipped_days_ago": 18,
+    "signed_days_ago": 16,
+    "items": [
+      {
+        "sku": "XD-010",
+        "name": "轻岚优选 卷发棒（粉色）",
+        "qty": 1,
+        "amount": 1039.0,
+        "category": "小家电",
+        "warranty": "签收后 7 天内无理由退货（未使用）；整机 1 年保修，主要部件 2 年",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      },
+      {
+        "sku": "SM-001",
+        "name": "轻岚优选 蓝牙耳机（透明）",
+        "qty": 1,
+        "amount": 59.0,
+        "category": "数码配件",
+        "warranty": "签收后 7 天内无理由退货；1 年内非人为故障换新（耳机电池 6 个月）",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "顺丰速运",
+      "tracking_no": "SF9900112233",
+      "state": "已签收",
+      "last_update_hours_ago": 384,
+      "traces": [
+        {
+          "hours_ago": 384,
+          "text": "快件已签收，签收人：本人"
+        }
+      ]
+    },
+    "price_drop": null
+  },
+  "2024093012012": {
+    "order_no": "2024093012012",
+    "scenario": "已拒收退回中（等同退货申请）",
+    "status": "退回中",
+    "buyer_masked": "138****2012",
+    "phone_tail": "2012",
+    "paid_amount": 139.0,
+    "paid_days_ago": 8,
+    "shipped_days_ago": 6,
+    "signed_days_ago": null,
+    "items": [
+      {
+        "sku": "XB-001",
+        "name": "轻岚优选 通勤托特包（米色）",
+        "qty": 1,
+        "amount": 139.0,
+        "category": "箱包",
+        "warranty": "签收后 7 天内无理由退货；1 年内拉链、拉杆、轮子非人为损坏免费维修",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "中通快递",
+      "tracking_no": "ZT1122334455",
+      "state": "退回中",
+      "last_update_hours_ago": 20,
+      "traces": [
+        {
+          "hours_ago": 20,
+          "text": "快件已按客户要求拒收，正在退回发货地"
+        }
+      ]
+    },
+    "price_drop": null
+  },
+  "2024093012018": {
+    "order_no": "2024093012018",
+    "scenario": "部分退款场景：两件商品，只想退其中一件",
+    "status": "已签收",
+    "buyer_masked": "138****2018",
+    "phone_tail": "2018",
+    "paid_amount": 408.0,
+    "paid_days_ago": 7,
+    "shipped_days_ago": 5,
+    "signed_days_ago": 3,
+    "items": [
+      {
+        "sku": "FS-007",
+        "name": "轻岚优选 A字半身裙（酒红）",
+        "qty": 1,
+        "amount": 299.0,
+        "category": "服饰",
+        "warranty": "签收后 7 天内无理由退货（吊牌完整）；30 天内质量问题包退换",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      },
+      {
+        "sku": "CJ-003",
+        "name": "轻岚优选 不锈钢汤锅（黑色）",
+        "qty": 1,
+        "amount": 109.0,
+        "category": "厨具",
+        "warranty": "签收后 7 天内无理由退货（未使用）；1 年内开裂、脱柄等质量问题包换",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "顺丰速运",
+      "tracking_no": "SF4242424242",
+      "state": "已签收",
+      "last_update_hours_ago": 72,
+      "traces": [
+        {
+          "hours_ago": 72,
+          "text": "快件已签收，签收人：本人"
+        }
+      ]
+    },
+    "price_drop": null
+  },
+  "2024093012013": {
+    "order_no": "2024093012013",
+    "scenario": "换货：签收 4 天，同款有库存（可换）",
+    "status": "已签收",
+    "buyer_masked": "138****2013",
+    "phone_tail": "2013",
+    "paid_amount": 139.0,
+    "paid_days_ago": 8,
+    "shipped_days_ago": 6,
+    "signed_days_ago": 4,
+    "items": [
+      {
+        "sku": "FS-002",
+        "name": "轻岚优选 纯棉短袖T恤（燕麦色）",
+        "qty": 1,
+        "amount": 139.0,
+        "category": "服饰",
+        "warranty": "签收后 7 天内无理由退货（吊牌完整）；30 天内质量问题包退换",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "顺丰速运",
+      "tracking_no": "SF1010101010",
+      "state": "已签收",
+      "last_update_hours_ago": 96,
+      "traces": [
+        {
+          "hours_ago": 96,
+          "text": "快件已签收，签收人：本人"
+        }
+      ]
+    },
+    "price_drop": null
+  },
+  "2024093012014": {
+    "order_no": "2024093012014",
+    "scenario": "换货：已经换过一次（限一次，应拒绝）",
+    "status": "已签收",
+    "buyer_masked": "138****2014",
+    "phone_tail": "2014",
+    "paid_amount": 239.0,
+    "paid_days_ago": 15,
+    "shipped_days_ago": 13,
+    "signed_days_ago": 5,
+    "items": [
+      {
+        "sku": "XX-003",
+        "name": "轻岚优选 厚底老爹鞋（米色）",
+        "qty": 1,
+        "amount": 239.0,
+        "category": "鞋靴",
+        "warranty": "签收后 7 天内无理由退货（未穿着、鞋底无磨损）；90 天内开胶断底包换",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 1,
+    "logistics": {
+      "company": "圆通速递",
+      "tracking_no": "YT3131313131",
+      "state": "已签收",
+      "last_update_hours_ago": 120,
+      "traces": [
+        {
+          "hours_ago": 120,
+          "text": "快件已签收，签收人：本人"
+        }
+      ]
+    },
+    "price_drop": null
+  },
+  "2024091922331": {
+    "order_no": "2024091922331",
+    "scenario": "签收 5 天，同款降价 50 元（价保可退差价）",
+    "status": "已签收",
+    "buyer_masked": "138****2331",
+    "phone_tail": "2331",
+    "paid_amount": 339.0,
+    "paid_days_ago": 9,
+    "shipped_days_ago": 7,
+    "signed_days_ago": 5,
+    "items": [
+      {
+        "sku": "SM-009",
+        "name": "轻岚优选 键盘膜（白色）",
+        "qty": 1,
+        "amount": 339.0,
+        "category": "数码配件",
+        "warranty": "签收后 7 天内无理由退货；1 年内非人为故障换新（耳机电池 6 个月）",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "顺丰速运",
+      "tracking_no": "SF9988776655",
+      "state": "已签收",
+      "last_update_hours_ago": 120,
+      "traces": [
+        {
+          "hours_ago": 120,
+          "text": "快件已签收，签收人：本人"
+        }
+      ]
+    },
+    "price_drop": {
+      "current_price": 299.0,
+      "diff": 50.0,
+      "changed_days_ago": 1
+    }
+  },
+  "2024093012015": {
+    "order_no": "2024093012015",
+    "scenario": "签收 20 天，虽降价但已过 15 天价保期",
+    "status": "已签收",
+    "buyer_masked": "138****2015",
+    "phone_tail": "2015",
+    "paid_amount": 349.0,
+    "paid_days_ago": 24,
+    "shipped_days_ago": 22,
+    "signed_days_ago": 20,
+    "items": [
+      {
+        "sku": "XD-003",
+        "name": "轻岚优选 手持挂烫机（薄荷绿）",
+        "qty": 1,
+        "amount": 349.0,
+        "category": "小家电",
+        "warranty": "签收后 7 天内无理由退货（未使用）；整机 1 年保修，主要部件 2 年",
+        "used": false,
+        "intimate": false,
+        "custom_made": false,
+        "activated": false,
+        "food": false,
+        "quality_issue": false
+      }
+    ],
+    "exchange_count": 0,
+    "logistics": {
+      "company": "中通快递",
+      "tracking_no": "ZT1010101010",
+      "state": "已签收",
+      "last_update_hours_ago": 480,
+      "traces": [
+        {
+          "hours_ago": 480,
+          "text": "快件已签收，签收人：本人"
+        }
+      ]
+    },
+    "price_drop": {
+      "current_price": 199.0,
+      "diff": 60.0,
+      "changed_days_ago": 2
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{"id": "R01", "query": "7天无理由怎么算时间", "expect_type": ["03-退换货政策", "04-FAQ清单"], "expect_keywords": ["签收", "7 天"], "note": "政策类应命中政策文档，不能命中产品手册"}
+{"id": "R02", "query": "退货运费谁承担", "expect_type": ["03-退换货政策", "04-FAQ清单"], "expect_keywords": ["运费"], "note": "易与物流政策混淆，应命中退换货政策"}
+{"id": "R03", "query": "退款多久能到账", "expect_type": ["03-退换货政策", "04-FAQ清单"], "expect_keywords": ["1-7"], "note": "时效类，答案里必须有具体工作日数"}
+{"id": "R04", "query": "内衣能退吗", "expect_type": ["03-退换货政策", "04-FAQ清单"], "expect_keywords": ["贴身"], "note": "特殊品类限制"}
+{"id": "R05", "query": "食品拆封了还能退吗", "expect_type": ["03-退换货政策", "04-FAQ清单"], "expect_keywords": ["食品"], "note": "品类限制 + 质量问题例外"}
+{"id": "R06", "query": "价保怎么申请，能退多少差价", "expect_type": ["03-退换货政策", "04-FAQ清单"], "expect_keywords": ["15 天", "差价"], "note": "价保窗口与计算公式"}
+{"id": "R07", "query": "用了优惠券的订单退款会退券吗", "expect_type": ["03-退换货政策", "04-FAQ清单"], "expect_keywords": ["优惠券"], "note": "优惠券退回规则"}
+{"id": "R08", "query": "质量问题怎么举证", "expect_type": ["03-退换货政策", "04-FAQ清单"], "expect_keywords": ["照片"], "note": "举证材料清单"}
+{"id": "R09", "query": "多久发货", "expect_type": ["03-退换货政策", "04-FAQ清单"], "expect_keywords": ["48 小时"], "note": "发货时效，属物流政策"}
+{"id": "R10", "query": "物流三天没更新了是不是丢了", "expect_type": ["03-退换货政策", "04-FAQ清单"], "expect_keywords": ["48 小时", "异常"], "note": "异常件判定阈值，关键数字必须准确"}
+{"id": "R11", "query": "快递丢件怎么赔", "expect_type": ["03-退换货政策", "04-FAQ清单"], "expect_keywords": ["赔付"], "note": "丢件处理流程"}
+{"id": "R12", "query": "可以改收货地址吗", "expect_type": ["03-退换货政策", "04-FAQ清单"], "expect_keywords": ["改"], "note": "改址规则"}
+{"id": "R13", "query": "发票抬头写错了能重开吗", "expect_type": ["03-退换货政策", "04-FAQ清单"], "expect_keywords": ["30 天"], "note": "发票重开期限"}
+{"id": "R14", "query": "轻岚优选 陶瓷刀具三件套 的材质是什么", "expect_type": "01-产品手册", "expect_keywords": ["陶瓷"], "note": "商品参数类，应命中该商品手册"}
+{"id": "R15", "query": "轻岚优选 蓝牙耳机 保修多久", "expect_type": "01-产品手册", "expect_keywords": ["保修", "1 年"], "note": "商品级保修政策"}
+{"id": "R16", "query": "瑜伽垫怎么清洗", "expect_type": "01-产品手册", "expect_keywords": ["擦拭", "晾干"], "note": "保养方式"}
+{"id": "R17", "query": "法式方领连衣裙 有什么风险提示", "expect_type": "01-产品手册", "expect_keywords": ["浮色"], "note": "风险提示字段"}
+{"id": "R18", "query": "空气炸锅 额定功率是多少", "expect_type": "01-产品手册", "expect_keywords": ["功率"], "note": "规格参数"}
+{"id": "R19", "query": "宠物粮开封后能放多久", "expect_type": "01-产品手册", "expect_keywords": ["30 天", "密封"], "note": "宠物用品类特殊说明"}
+{"id": "R20", "query": "处理超期退货申请的流程是什么", "expect_type": "02-SOP标准流程", "expect_keywords": ["人工审核", "升级"], "note": "流程类问题应命中 SOP 而非政策"}
+{"id": "R21", "query": "客户威胁要曝光怎么处理", "expect_type": "02-SOP标准流程", "expect_keywords": ["主管", "升级"], "note": "高风险场景，必须命中投诉类 SOP"}
+{"id": "R22", "query": "物流停滞的催办时限要求", "expect_type": "02-SOP标准流程", "expect_keywords": ["4 小时"], "note": "SOP 里的时限要求"}
+{"id": "R23", "query": "尺码推荐咨询的标准流程", "expect_type": "02-SOP标准流程", "expect_keywords": ["库存", "时效"], "note": "售前 SOP"}
+{"id": "R24", "query": "重复扣款了怎么办", "expect_type": "04-FAQ清单", "expect_keywords": ["截图", "退回"], "note": "FAQ 应能直接命中"}
+{"id": "R25", "query": "怎么辨别是不是正品", "expect_type": "04-FAQ清单", "expect_keywords": ["授权"], "note": "售前类 FAQ"}
+{"id": "R26", "query": "孕妇能用吗", "expect_type": "04-FAQ清单", "expect_keywords": ["咨询医生"], "note": "特殊人群，答案应谨慎"}
+{"id": "R27", "query": "客服态度不好我要投诉", "expect_type": "05-客服话术库", "expect_keywords": ["主管"], "note": "话术类应命中话术库"}
+{"id": "R28", "query": "安抚客户等待过久的说法", "expect_type": "05-客服话术库", "expect_keywords": ["优先"], "note": "直接找话术模板"}
+{"id": "R29", "query": "要求三倍赔偿怎么回复", "expect_type": "05-客服话术库", "expect_keywords": ["无权", "上报"], "note": "关键护栏：不能承诺赔偿金额，只能说上报"}
+{"id": "R30", "query": "退货申请提交前要怎么问客户确认", "expect_type": "05-客服话术库", "expect_keywords": ["确认", "提交"], "note": "二次确认话术"}

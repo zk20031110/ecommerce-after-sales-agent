@@ -1,0 +1,1374 @@
+# ============================================================================
+# 售后客服 Agent · 完整版 DSL（通义千问 + 真实工具调用）
+#
+# DSL 版本 0.7.0 / provider: langgenius/tongyi/tongyi / model: qwen-plus
+# 插件依赖：langgenius/tongyi（见文件底部 dependencies 段）
+#
+# 相比原来的骨架，这一版把 3 条占位分支接成了真能力：
+#   物流查询   → 抽订单号 → 调后端查真实物流 → qwen 话术化
+#   退款退货   → 调后端判资格（7天/已使用/超期）→ qwen 给方案
+#   换货       → 调后端判换货资格 → qwen 给方案
+#   投诉/转人工 → 调后端建真实工单 → qwen 安抚并给工单号
+#   通用咨询   → 知识库检索 → qwen 回答（沿用原来的）
+#
+# 知识库检索节点挂的是**三个库**（政策与FAQ / 产品手册 / 流程与话术），不是一个大库。
+# 原因见 README「知识库怎么分」：混在一起会串味，实测素材类型命中率只有 43%，拆开后 93%。
+# 换知识库时 dataset_ids 必须同步改——填错不会报错，只是永远检索不到东西。
+#
+# 提示词集中管理在 prompts/reply_prompts.md，分类器的 instruction 见
+# prompts/classifier_instruction.txt，改提示词时两处要同步。
+#
+# 导入前必须确认一件事：mock 后端正在运行，且 Dify 容器能访问到它。
+# 地址写的是 http://host.docker.internal:8000（容器访问宿主机的标准写法）。
+# 如果运行时报连接失败，先跑这条命令确认：
+#     docker exec -it docker-api-1 curl -s http://host.docker.internal:8000/health
+# ============================================================================
+app:
+  description: 意图识别 → 真实工具调用 → 知识库 RAG → 分级转人工的售后 Agent（通义千问版）
+  icon: 🛒
+  icon_background: '#FFEAD5'
+  icon_type: emoji
+  mode: advanced-chat
+  name: 电商售后 AI Agent（完整版）
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/tongyi:0.2.22@9cea96ffc7977f536c02999c80ff1283b1819aab9b6fa2fdf789d0c6c7d03715
+    version: null
+kind: app
+version: 0.7.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      enabled: false
+      image:
+        enabled: false
+    opening_statement: 您好，我是售后客服小岚。把订单号发我，物流、退货、换货、价保、发票我都能直接帮你查。
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions:
+    - 订单 2024091288765 我要退货
+    - 订单 2024092004455 三天没动了
+    - 刚买就降价了能退差价吗
+    - 我要投诉
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: code
+      id: 1800000000001-source-1800000000003-target
+      source: '1800000000001'
+      sourceHandle: source
+      target: '1800000000003'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: http-request
+      id: 1800000000003-source-1800000000022-target
+      source: '1800000000003'
+      sourceHandle: source
+      target: '1800000000022'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: if-else
+      id: 1800000000022-source-1800000000023-target
+      source: '1800000000022'
+      sourceHandle: source
+      target: '1800000000023'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: http-request
+      id: 1800000000023-true-1800000000016-target
+      source: '1800000000023'
+      sourceHandle: 'true'
+      target: '1800000000016'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: question-classifier
+      id: 1800000000023-false-1800000000002-target
+      source: '1800000000023'
+      sourceHandle: 'false'
+      target: '1800000000002'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: http-request
+      id: 1800000000002-1-1800000000004-target
+      source: '1800000000002'
+      sourceHandle: '1'
+      target: '1800000000004'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: llm
+      id: 1800000000004-source-1800000000005-target
+      source: '1800000000004'
+      sourceHandle: source
+      target: '1800000000005'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 1800000000005-source-1800000000006-target
+      source: '1800000000005'
+      sourceHandle: source
+      target: '1800000000006'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: http-request
+      id: 1800000000002-2-1800000000007-target
+      source: '1800000000002'
+      sourceHandle: '2'
+      target: '1800000000007'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: llm
+      id: 1800000000007-source-1800000000009-target
+      source: '1800000000007'
+      sourceHandle: source
+      target: '1800000000009'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 1800000000009-source-1800000000010-target
+      source: '1800000000009'
+      sourceHandle: source
+      target: '1800000000010'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: http-request
+      id: 1800000000002-3-1800000000008-target
+      source: '1800000000002'
+      sourceHandle: '3'
+      target: '1800000000008'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: llm
+      id: 1800000000008-source-1800000000011-target
+      source: '1800000000008'
+      sourceHandle: source
+      target: '1800000000011'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 1800000000011-source-1800000000012-target
+      source: '1800000000011'
+      sourceHandle: source
+      target: '1800000000012'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: knowledge-retrieval
+      id: 1800000000002-4-1800000000013-target
+      source: '1800000000002'
+      sourceHandle: '4'
+      target: '1800000000013'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: knowledge-retrieval
+        targetType: llm
+      id: 1800000000013-source-1800000000014-target
+      source: '1800000000013'
+      sourceHandle: source
+      target: '1800000000014'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 1800000000014-source-1800000000015-target
+      source: '1800000000014'
+      sourceHandle: source
+      target: '1800000000015'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: http-request
+      id: 1800000000002-5-1800000000016-target
+      source: '1800000000002'
+      sourceHandle: '5'
+      target: '1800000000016'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: http-request
+      id: 1800000000002-6-1800000000016-target
+      source: '1800000000002'
+      sourceHandle: '6'
+      target: '1800000000016'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: llm
+      id: 1800000000016-source-1800000000017-target
+      source: '1800000000016'
+      sourceHandle: source
+      target: '1800000000017'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: 1800000000017-source-1800000000024-target
+      source: '1800000000017'
+      sourceHandle: source
+      target: '1800000000024'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: answer
+      id: 1800000000024-source-1800000000018-target
+      source: '1800000000024'
+      sourceHandle: source
+      target: '1800000000018'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: http-request
+      id: 1800000000002-7-1800000000019-target
+      source: '1800000000002'
+      sourceHandle: '7'
+      target: '1800000000019'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: llm
+      id: 1800000000019-source-1800000000020-target
+      source: '1800000000019'
+      sourceHandle: source
+      target: '1800000000020'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 1800000000020-source-1800000000021-target
+      source: '1800000000020'
+      sourceHandle: source
+      target: '1800000000021'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        selected: false
+        title: 开始
+        type: start
+        variables: []
+      height: 72
+      id: '1800000000001'
+      position:
+        x: 30
+        y: 400
+      positionAbsolute:
+        x: 30
+        y: 400
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 0
+    - data:
+        code: |
+          import re
+
+
+          def main(text: str, session_id: str = "") -> dict:
+              """从客户消息里抽订单号和手机号后四位。
+
+              phone_tail 只认「前后都不是数字的恰好 4 位数字」，
+              所以订单号内部的 4 位数不会被误当成手机号尾号。
+              大额退款需要它做身份核验，客户单独回一句 "2010" 也能被识别。
+
+              订单号抽不到时返回空串，由后端回退到本会话记住的订单号——
+              这样客户第二句说"好，退吧"就不用再报一次单号。
+              """
+              text = text or ""
+              order_no = ""
+              m = re.search(r"\b(\d{13,16})\b", text)
+              if m:
+                  order_no = m.group(1)
+              else:
+                  m2 = re.search(r"\b((?:SN|DD|ORD)[A-Za-z0-9]{6,})\b", text, re.IGNORECASE)
+                  if m2:
+                      order_no = m2.group(1)
+
+              phone_tail = ""
+              for mm in re.finditer(r"(?<!\d)(\d{4})(?!\d)", text):
+                  phone_tail = mm.group(1)
+                  break
+              # 会话 ID 也一起透传出去：Dify 的 URL 查询参数里拿不到 sys 变量，
+              # 但节点输出变量可以，所以让这个节点把它转一手。
+              return {"order_no": order_no, "phone_tail": phone_tail,
+                      "session_id": session_id or ""}
+        code_language: python3
+        outputs:
+          order_no:
+            children: null
+            type: string
+          phone_tail:
+            children: null
+            type: string
+          session_id:
+            children: null
+            type: string
+        selected: false
+        title: 订单号抽取
+        type: code
+        variables:
+        - value_selector:
+          - sys
+          - conversation_id
+          variable: session_id
+        - value_selector:
+          - sys
+          - query
+          variable: text
+      height: 90
+      id: '1800000000003'
+      position:
+        x: 320
+        y: 400
+      positionAbsolute:
+        x: 320
+        y: 400
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        classes:
+        - id: '1'
+          name: 物流查询
+        - id: '2'
+          name: 退款退货
+        - id: '3'
+          name: 换货
+        - id: '4'
+          name: 通用咨询
+        - id: '5'
+          name: 投诉情绪
+        - id: '6'
+          name: 转人工
+        - id: '7'
+          name: 确认提交
+        instruction: |
+          你是电商售后客服的意图识别模块。根据用户消息判断意图，从以下类别中选一个：
+
+          - 物流查询：查快递/物流轨迹、东西到哪了、催件、几天没更新、疑似丢件
+          - 退款退货：明确表达要办理退款或退货（"我要退款""不想要了""退货"）
+          - 换货：换货、换尺码、换颜色、换型号
+          - 通用咨询：询问售后规则、时效、流程、费用、发票（"退款多久到账""运费谁出""能退吗"）
+          - 投诉情绪：**强负面表达或明确诉求**——辱骂、要求赔偿、扬言差评或曝光，
+            以及"太差了""垃圾""骗子""态度差"这类强烈用词。
+            例："必须赔我钱""我要曝光你们""你们客服态度太差了"
+            ⚠️ **弱负面表达不算投诉情绪**："服务不太行""有点失望""体验一般"
+            "不太满意"——客户只是在表达情绪，还没提出具体诉求。
+            这类消息按实际诉求分流；没有具体诉求时归「通用咨询」，
+            由客服先共情、再追问遇到了什么问题。
+            情绪由后端累计，客户**连续**表达不满时才会自动升级人工。
+          - 转人工：明确要求人工客服
+          - 确认提交：客户在确认执行上一步提出的操作（"好""可以""提交""确认""就这么办"），
+            或者只发送了一串 4 位数字（这是在提供手机号后四位做身份核验）
+
+          判定优先级，按顺序匹配：
+          1. 消息只有"好/可以/提交/确认/行/没问题"这类确认词，或者只有 4 位数字 → 确认提交
+          2. 提到"换"（换尺码/换颜色/换型号）→ 换货，即使同时提到"退"
+          3. 提到降价、补差价、价保 → 通用咨询
+          4. 明确表达要办理退款或退货 → 退款退货；只是问规则、流程、时效 → 通用咨询
+          5. 出现**强负面用词或明确诉求**（赔偿/曝光/辱骂/"太差了"/"垃圾"）→ 投诉情绪；
+             **弱负面表达**（"不太行"/"有点失望"/"体验一般"）→ **不判投诉情绪**，按实际诉求分流
+          6. 明确说"转人工""叫真人" → 转人工
+          7. 物流相关（到哪了、催件、几天没动、丢了）→ 物流查询
+          8. 判不准时选「通用咨询」，让知识库兜底，不要猜成退款
+
+          注意：客户只发了订单号或一句"在吗"，选「通用咨询」，并在回答里追问具体诉求。
+          注意：确认提交必须是"单纯的确认"，如果客户在确认的同时提了新诉求
+          （如"好，但是我想改成换货"），按新诉求分类，不要判成确认提交。
+        model:
+          completion_params:
+            temperature: 0
+          mode: chat
+          name: qwen-plus
+          provider: langgenius/tongyi/tongyi
+        query_variable_selector:
+        - sys
+        - query
+        selected: false
+        title: 意图识别
+        type: question-classifier
+        vision:
+          enabled: false
+      height: 420
+      id: '1800000000002'
+      position:
+        x: 610
+        y: 400
+      positionAbsolute:
+        x: 610
+        y: 400
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        authorization:
+          config:
+            api_key: dev-local-key
+            header: X-API-Key
+            type: custom
+          type: api-key
+        body:
+          data: []
+          type: none
+        headers: ''
+        method: get
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 5
+          max_read_timeout: 10
+          max_write_timeout: 10
+        title: 查订单与物流
+        type: http-request
+        url: 'http://host.docker.internal:8000/api/order-query?order_no={{#1800000000003.order_no#}}&session_id={{#1800000000003.session_id#}}'
+        variables: []
+      height: 120
+      id: '1800000000004'
+      position:
+        x: 900
+        y: 40
+      positionAbsolute:
+        x: 900
+        y: 40
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.3
+          mode: chat
+          name: qwen-plus
+          provider: langgenius/tongyi/tongyi
+        prompt_template:
+        - id: p-system
+          role: system
+          text: |
+            你是电商售后客服小岚。系统已经查到了真实物流数据，你负责把它翻译成客户能看懂的话。
+
+            铁律：
+            1. 只能使用接口返回的数据，不得编造金额、时间、单号、快递公司。
+            2. 数字与时间必须原样引用，不要换算、不要估算。
+            3. 接口返回 404、为空或报错时，礼貌请客户提供正确订单号，或说明查询失败并建议转人工。
+            4. 不要用"通常""一般""大概"来填补你不知道的信息。
+
+            回复结构：结论 → 依据（订单状态 + 最近一条物流节点与时间）→ 下一步。
+            全文不超过 150 字，不要用"亲爱的"这类过度称呼。
+            语言：只用简体中文。除订单号、工单号、退款单号这类编号外，
+            不允许出现任何英文单词或字母缩写（例如 frustration、OK、sorry）。
+        - id: p-user
+          role: user
+          text: |
+            客户问题：{{#sys.query#}}
+            订单号：{{#1800000000003.order_no#}}
+            接口返回：{{#1800000000004.body#}}
+            请根据以上真实数据回答。
+        selected: false
+        title: 生成物流回复
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 110
+      id: '1800000000005'
+      position:
+        x: 1180
+        y: 40
+      positionAbsolute:
+        x: 1180
+        y: 40
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        answer: '{{#1800000000005.text#}}'
+        selected: false
+        title: 回复：物流查询
+        type: answer
+        variables: []
+      height: 101
+      id: '1800000000006'
+      position:
+        x: 1460
+        y: 40
+      positionAbsolute:
+        x: 1460
+        y: 40
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        authorization:
+          config:
+            api_key: dev-local-key
+            header: X-API-Key
+            type: custom
+          type: api-key
+        body:
+          data:
+          - id: b-json-refund
+            type: text
+            value: '{"request_type": "refund"}'
+          type: json
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 5
+          max_read_timeout: 10
+          max_write_timeout: 10
+        title: 退款资格判定
+        type: http-request
+        url: 'http://host.docker.internal:8000/api/after-sales/eligibility?order_no={{#1800000000003.order_no#}}&session_id={{#1800000000003.session_id#}}'
+        variables: []
+      height: 150
+      id: '1800000000007'
+      position:
+        x: 900
+        y: 300
+      positionAbsolute:
+        x: 900
+        y: 300
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.3
+          mode: chat
+          name: qwen-plus
+          provider: langgenius/tongyi/tongyi
+        prompt_template:
+        - id: p-system
+          role: system
+          text: |
+            你是电商售后客服小岚。系统已经完成退货资格判定，你只负责把结论翻译成客户能听懂的话，
+            不要自己做规则判断。
+
+            铁律：
+            1. 只能使用接口返回的数据，不得编造金额、天数、时效。
+            2. eligible 为 true：给出明确结论，并原样引用退款金额。
+            3. eligible 为 false：说明原因（引用 rule_text），并给出 next_step 里的替代方案。
+            4. requires_human 为 true：明确说明需要人工核实，不要承诺结果。
+            5. 规则码、字段名这类内部信息不要出现在回复里，用客户能懂的话转述。
+
+            回复结构：结论 → 依据 → 下一步（客户要做什么、我们要做什么）。
+            需要客户确认才能提交的动作，必须以问句结尾。不超过 150 字。
+            语言：只用简体中文。除订单号、工单号、退款单号这类编号外，
+            不允许出现任何英文单词或字母缩写。
+        - id: p-user
+          role: user
+          text: |
+            客户问题：{{#sys.query#}}
+            订单号：{{#1800000000003.order_no#}}
+            资格判定结果：{{#1800000000007.body#}}
+            请根据以上真实数据回答。
+        selected: false
+        title: 生成退款方案
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 110
+      id: '1800000000009'
+      position:
+        x: 1180
+        y: 300
+      positionAbsolute:
+        x: 1180
+        y: 300
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        answer: '{{#1800000000009.text#}}'
+        selected: false
+        title: 回复：退款退货
+        type: answer
+        variables: []
+      height: 101
+      id: '1800000000010'
+      position:
+        x: 1460
+        y: 300
+      positionAbsolute:
+        x: 1460
+        y: 300
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        authorization:
+          config:
+            api_key: dev-local-key
+            header: X-API-Key
+            type: custom
+          type: api-key
+        body:
+          data:
+          - id: b-json-exchange
+            type: text
+            value: '{"request_type": "exchange"}'
+          type: json
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 5
+          max_read_timeout: 10
+          max_write_timeout: 10
+        title: 换货资格判定
+        type: http-request
+        url: 'http://host.docker.internal:8000/api/after-sales/eligibility?order_no={{#1800000000003.order_no#}}&session_id={{#1800000000003.session_id#}}&request_type=exchange'
+        variables: []
+      height: 150
+      id: '1800000000008'
+      position:
+        x: 900
+        y: 560
+      positionAbsolute:
+        x: 900
+        y: 560
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.3
+          mode: chat
+          name: qwen-plus
+          provider: langgenius/tongyi/tongyi
+        prompt_template:
+        - id: p-system
+          role: system
+          text: |
+            你是电商售后客服小岚。系统已经完成换货资格判定，你只负责把结论翻译成客户能听懂的话。
+
+            铁律：
+            1. 只能使用接口返回的数据，不得编造库存、运费、时效。
+            2. 换货规则：签收后 7 天内、同款有库存可换，限一次；质量问题运费我们承担，非质量问题由客户承担。
+            3. requires_human 为 true 时，说明需要人工核实，不要承诺结果。
+
+            回复结构：结论 → 依据 → 下一步（客户做什么、我们做什么）。
+            不超过 150 字，不要出现规则码和字段名。
+            语言：只用简体中文。除订单号、工单号、退款单号这类编号外，
+            不允许出现任何英文单词或字母缩写。
+        - id: p-user
+          role: user
+          text: |
+            客户问题：{{#sys.query#}}
+            订单号：{{#1800000000003.order_no#}}
+            换货资格判定结果：{{#1800000000008.body#}}
+            请根据以上真实数据回答。
+        selected: false
+        title: 生成换货方案
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 110
+      id: '1800000000011'
+      position:
+        x: 1180
+        y: 560
+      positionAbsolute:
+        x: 1180
+        y: 560
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        answer: '{{#1800000000011.text#}}'
+        selected: false
+        title: 回复：换货
+        type: answer
+        variables: []
+      height: 101
+      id: '1800000000012'
+      position:
+        x: 1460
+        y: 560
+      positionAbsolute:
+        x: 1460
+        y: 560
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        dataset_ids:
+        - 865a2789-251d-4527-84ce-0f8beca5b1e5
+        - 03e1474a-3b66-4a23-b7fe-d3b23aab23dc
+        - e5f534f3-6ec5-4286-87bf-7387c5bcfbae
+        metadata_filtering_mode: disabled
+        multiple_retrieval_config:
+          reranking_enable: true
+          reranking_mode: reranking_model
+          reranking_model:
+            model: qwen3-rerank
+            provider: langgenius/tongyi/tongyi
+          score_threshold: 0.5
+          top_k: 4
+          weights: null
+        query_attachment_selector: []
+        query_variable_selector:
+        - sys
+        - query
+        retrieval_mode: multiple
+        selected: false
+        title: 知识库检索
+        type: knowledge-retrieval
+      height: 89
+      id: '1800000000013'
+      position:
+        x: 900
+        y: 820
+      positionAbsolute:
+        x: 900
+        y: 820
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1800000000013'
+          - result
+        model:
+          completion_params:
+            temperature: 0.3
+          mode: chat
+          name: qwen-plus
+          provider: langgenius/tongyi/tongyi
+        prompt_template:
+        - id: p-system
+          role: system
+          text: |
+            你是电商售后客服小岚。请只依据知识库内容回答客户关于售后政策、时效、运费、发票的问题。
+            知识库里没有的内容，不要编造，直接说明无法确认并建议转人工。
+            回答不超过 150 字，先给结论，再补充依据。
+
+            特别注意：如果客户只是在表达不满、还没提出具体诉求
+            （例如"你们这服务不太行""有点失望"），
+            **不要查政策、也不要转人工**：先共情一句，然后问他具体遇到什么问题。
+            这类客户还没说要办什么事，转人工等于把问题丢给别人，问清楚才是负责。
+            语言：只用简体中文。除订单号、工单号、退款单号这类编号外，
+            不允许出现任何英文单词或字母缩写。
+        - id: p-user
+          role: user
+          text: '{{#sys.query#}}'
+        selected: false
+        title: 生成咨询回答
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 110
+      id: '1800000000014'
+      position:
+        x: 1180
+        y: 820
+      positionAbsolute:
+        x: 1180
+        y: 820
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        answer: '{{#1800000000014.text#}}'
+        selected: false
+        title: 回复：通用咨询
+        type: answer
+        variables: []
+      height: 101
+      id: '1800000000015'
+      position:
+        x: 1460
+        y: 820
+      positionAbsolute:
+        x: 1460
+        y: 820
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        authorization:
+          config:
+            api_key: dev-local-key
+            header: X-API-Key
+            type: custom
+          type: api-key
+        body:
+          data:
+          - id: b-json-ticket
+            type: text
+            value: '{"intent": "complaint", "sentiment": "negative"}'
+          type: json
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 5
+          max_read_timeout: 10
+          max_write_timeout: 10
+        title: 转人工建工单
+        type: http-request
+        url: 'http://host.docker.internal:8000/api/tickets?order_no={{#1800000000003.order_no#}}&session_id={{#1800000000003.session_id#}}'
+        variables: []
+      height: 150
+      id: '1800000000016'
+      position:
+        x: 900
+        y: 1080
+      positionAbsolute:
+        x: 900
+        y: 1080
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.3
+          mode: chat
+          name: qwen-plus
+          provider: langgenius/tongyi/tongyi
+        prompt_template:
+        - id: p-system
+          role: system
+          text: |
+            你是电商售后客服小岚。客户情绪激动或明确要求转人工，系统已建好工单。
+
+            要求：
+            1. 第一句先共情，只共情一句，不要连续道歉。
+            2. 必须原样告知工单号和预计等待时长（用接口返回的 ticket_id 与 eta_minutes）。
+            3. 说明订单信息已一并带过去，客户不用重复叙述。
+            4. 不承诺赔偿、不承诺加急，不推卸责任（禁止说"这是规定"）。
+            不超过 120 字。
+            语言：只用简体中文。除订单号、工单号、退款单号这类编号外，
+            不允许出现任何英文单词或字母缩写（尤其是 frustration、sorry 这类
+            表达情绪的词，必须写成"沮丧""抱歉"）。
+        - id: p-user
+          role: user
+          text: |
+            客户问题：{{#sys.query#}}
+            工单接口返回：{{#1800000000016.body#}}
+            请生成安抚回复。
+        selected: false
+        title: 生成安抚回复
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 110
+      id: '1800000000017'
+      position:
+        x: 1180
+        y: 1080
+      positionAbsolute:
+        x: 1180
+        y: 1080
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        answer: '{{#1800000000024.reply#}}'
+        selected: false
+        title: 回复：投诉与转人工
+        type: answer
+        variables: []
+      height: 101
+      id: '1800000000018'
+      position:
+        x: 1460
+        y: 1080
+      positionAbsolute:
+        x: 1460
+        y: 1080
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        authorization:
+          config:
+            api_key: dev-local-key
+            header: X-API-Key
+            type: custom
+          type: api-key
+        body:
+          data:
+          - id: b-json-submit
+            type: text
+            value: '{"request_type": "refund"}'
+          type: json
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 5
+          max_read_timeout: 10
+          max_write_timeout: 10
+        title: 提交售后单
+        type: http-request
+        url: 'http://host.docker.internal:8000/api/after-sales/refunds?order_no={{#1800000000003.order_no#}}&session_id={{#1800000000003.session_id#}}&phone_tail={{#1800000000003.phone_tail#}}&request_type=refund'
+        variables: []
+      height: 150
+      id: '1800000000019'
+      position:
+        x: 900
+        y: 1340
+      positionAbsolute:
+        x: 900
+        y: 1340
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.3
+          mode: chat
+          name: qwen-plus
+          provider: langgenius/tongyi/tongyi
+        prompt_template:
+        - id: p-system
+          role: system
+          text: |
+            你是电商售后客服小岚。系统已经执行了客户确认的操作，你负责如实告知结果。
+
+            按接口返回的内容分情况回复：
+            1. submitted = true：告知退款单号、退款金额、到账时效。金额和单号必须原样引用。
+            2. rule_code = RULE-NEED-VERIFY：说明金额较大需要核验身份，请客户提供下单手机号后四位。
+               只问这一件事，不要重复其他内容。
+            3. rule_code = RULE-VERIFY-FAILED：说明后四位与下单时不一致，请客户核对；
+               并说明可以转人工核实身份。
+            4. rule_code = RULE-NEED-ORDER-NO：说明还不知道是哪一单，请客户提供订单号。
+            5. 其他被拒绝的情况：说明拒绝原因（引用 rule_text），并给出替代方案。
+
+            铁律：不许编造退款单号、金额、到账时间；接口没返回的一律不说。
+            不超过 150 字，不要出现字段名和规则代码。
+            语言：只用简体中文。除订单号、工单号、退款单号这类编号外，
+            不允许出现任何英文单词或字母缩写。
+        - id: p-user
+          role: user
+          text: |
+            客户消息：{{#sys.query#}}
+            提交接口返回：{{#1800000000019.body#}}
+            请如实告知客户结果。
+        selected: false
+        title: 生成提交结果回复
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 110
+      id: '1800000000020'
+      position:
+        x: 1180
+        y: 1340
+      positionAbsolute:
+        x: 1180
+        y: 1340
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        answer: '{{#1800000000020.text#}}'
+        selected: false
+        title: 回复：提交结果
+        type: answer
+        variables: []
+      height: 101
+      id: '1800000000021'
+      position:
+        x: 1460
+        y: 1340
+      positionAbsolute:
+        x: 1460
+        y: 1340
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        authorization:
+          config:
+            api_key: dev-local-key
+            header: X-API-Key
+            type: custom
+          type: api-key
+        body:
+          data:
+          - id: f-session-id
+            key: session_id
+            type: text
+            value: '{{#sys.conversation_id#}}'
+          - id: f-message
+            key: message
+            type: text
+            value: '{{#sys.query#}}'
+          type: x-www-form-urlencoded
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 5
+          max_read_timeout: 10
+          max_write_timeout: 10
+        title: 记录对话
+        type: http-request
+        url: 'http://host.docker.internal:8000/api/conversation/turn'
+        variables: []
+      height: 130
+      id: '1800000000022'
+      position:
+        x: 320
+        y: 700
+      positionAbsolute:
+        x: 320
+        y: 700
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: cond-should-escalate
+            value: '"should_escalate": true'
+            varType: string
+            variable_selector:
+            - '1800000000022'
+            - body
+          id: 'true'
+          logical_operator: and
+        desc: 客户连续表达不满时直接升级人工主管，不再走自动分流——情绪优先于意图
+        selected: false
+        title: 是否需要升级
+        type: if-else
+      height: 126
+      id: '1800000000023'
+      position:
+        x: 610
+        y: 700
+      positionAbsolute:
+        x: 610
+        y: 700
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    - data:
+        code: |
+          import re
+
+
+          # 常见的中文回复里会被模型混进来的英文词
+          FIX = {
+              "frustration": "沮丧", "frustrated": "沮丧", "sorry": "抱歉",
+              "apologize": "抱歉", "apologies": "抱歉", "ok": "好的",
+              "okay": "好的", "thanks": "谢谢", "thank you": "谢谢",
+              "problem": "问题", "issue": "问题", "delay": "延误",
+              "refund": "退款", "order": "订单", "please": "请",
+          }
+
+
+          def main(text: str) -> dict:
+              """把中文回复里混进来的英文词替换成中文。
+
+              为什么需要这一步：提示词里已经明确要求"只用简体中文"，但
+              qwen 是多语言模型，表达情绪时有概率漂移到英文（实测输出过
+              "很理解您此刻的 frustration"）。提示词是软约束，这里是硬保险。
+
+              关键细节：英文编号（TK26100409594801、SKU 号）不能动，
+              所以只替换词表里的词，再把剩下孤立的英文单词报出来供排查。
+              """
+              out = text or ""
+              for en, cn in FIX.items():
+                  # 顺手吃掉前面的空白，"此刻的 frustration" 才不会变成"此刻的 沮丧"
+                  out = re.sub(r"\s*(?<![A-Za-z0-9])" + re.escape(en) + r"(?![A-Za-z0-9])",
+                               cn, out, flags=re.IGNORECASE)
+              # 编号里的字母（如 TK26100409594801）前后紧邻数字，不会被匹配
+              leftover = re.findall(r"(?<![A-Za-z0-9])([A-Za-z]{3,})(?![A-Za-z0-9])", out)
+              return {"reply": out, "leftover_en": ",".join(leftover)}
+        code_language: python3
+        desc: 把模型偶尔混进来的英文词替换成中文，编号保持不动
+        outputs:
+          leftover_en:
+            children: null
+            type: string
+          reply:
+            children: null
+            type: string
+        selected: false
+        title: 清洗回复
+        type: code
+        variables:
+        - value_selector:
+          - '1800000000017'
+          - text
+          variable: text
+      height: 90
+      id: '1800000000024'
+      position:
+        x: 1460
+        y: 1180
+      positionAbsolute:
+        x: 1460
+        y: 1180
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 241
+      zIndex: 0
+    viewport:
+      x: 60
+      y: 40
+      zoom: 0.55
+  rag_pipeline_variables: []

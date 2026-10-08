@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>轻岚优选 · 在线客服</title>
+<style>
+  :root{
+    --bg:#f5f7f9; --card:#fff; --line:#e6eaee; --ink:#1f2933; --dim:#7b8794;
+    --brand:#2563eb; --brand-soft:#eef4ff; --ok:#0f9d58; --warn:#b45309;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{background:var(--bg);color:var(--ink);
+       font:15px/1.7 "Microsoft YaHei",-apple-system,"Segoe UI",sans-serif;
+       display:flex;justify-content:center;padding:18px}
+  .shell{width:min(760px,100%);display:flex;flex-direction:column;
+         background:var(--card);border:1px solid var(--line);border-radius:12px;
+         box-shadow:0 8px 30px rgba(31,41,51,.07);overflow:hidden}
+  header{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
+  header .logo{width:34px;height:34px;border-radius:9px;background:var(--brand);color:#fff;
+               display:grid;place-items:center;font-size:16px}
+  header h1{margin:0;font-size:15px;font-weight:600}
+  header .sub{font-size:12px;color:var(--dim)}
+  header .spacer{flex:1}
+  header button{background:none;border:1px solid var(--line);color:var(--dim);
+                border-radius:7px;padding:5px 11px;font:inherit;font-size:12px;cursor:pointer}
+  header button:hover{color:var(--brand);border-color:var(--brand)}
+  #log{flex:1;overflow-y:auto;padding:20px 18px;display:flex;flex-direction:column;gap:12px}
+  .msg{max-width:78%;padding:10px 14px;border-radius:12px;white-space:pre-wrap;word-break:break-word}
+  .msg.ai{background:#f1f4f7;align-self:flex-start;border-bottom-left-radius:4px}
+  .msg.me{background:var(--brand);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+  .msg.sys{align-self:center;background:var(--brand-soft);color:#1d4ed8;
+           font-size:13px;max-width:90%;text-align:center}
+  .msg.err{align-self:center;background:#fff7ed;color:var(--warn);font-size:13px;max-width:92%}
+  .who{font-size:11px;color:var(--dim);margin-bottom:3px}
+  .typing{display:flex;gap:4px;align-self:flex-start;padding:12px 16px;background:#f1f4f7;border-radius:12px}
+  .typing i{width:6px;height:6px;border-radius:50%;background:#9aa5b1;animation:b 1.2s infinite}
+  .typing i:nth-child(2){animation-delay:.2s}
+  .typing i:nth-child(3){animation-delay:.4s}
+  @keyframes b{0%,60%,100%{opacity:.3}30%{opacity:1}}
+  .quick{display:flex;flex-wrap:wrap;gap:8px;padding:0 18px 12px}
+  .quick button{background:var(--brand-soft);color:#1d4ed8;border:0;border-radius:16px;
+                padding:6px 13px;font:inherit;font-size:13px;cursor:pointer}
+  .quick button:hover{background:#e0ebff}
+  footer{border-top:1px solid var(--line);padding:12px 14px;display:flex;gap:9px;align-items:flex-end}
+  textarea{flex:1;min-height:44px;max-height:130px;resize:none;border:1px solid var(--line);
+           border-radius:10px;padding:11px 13px;font:inherit;outline:none;background:#fbfcfd}
+  textarea:focus{border-color:var(--brand);background:#fff}
+  footer .send{background:var(--brand);color:#fff;border:0;border-radius:10px;
+               padding:12px 20px;font:inherit;font-weight:600;cursor:pointer}
+  footer .send:disabled{opacity:.45;cursor:not-allowed}
+  .hint{font-size:12px;color:var(--dim);padding:0 18px 12px;text-align:center}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <div class="logo">岚</div>
+    <div>
+      <h1>轻岚优选 · 在线客服</h1>
+      <div class="sub" id="status">小岚为你服务</div>
+    </div>
+    <div class="spacer"></div>
+    <button id="reset">新会话</button>
+  </header>
+
+  <div id="log"></div>
+
+  <div class="quick" id="quick">
+    <button>订单 2024091288765 我的货到哪了</button>
+    <button>订单 2024091288765 我要退货</button>
+    <button>退货运费谁承担</button>
+    <button>我要投诉</button>
+  </div>
+
+  <footer>
+    <textarea id="input" rows="1" placeholder="描述你的问题，例如：订单 2024091288765 我要退货"></textarea>
+    <button class="send" id="send">发送</button>
+  </footer>
+  <div class="hint">AI 会先帮你处理，需要人工时会自动转接并带上你的上下文</div>
+</div>
+
+<script>
+const KEY = 'dev-local-key';
+const log = document.getElementById('log');
+const input = document.getElementById('input');
+const sendBtn = document.getElementById('send');
+const statusEl = document.getElementById('status');
+
+// 会话 ID 存在浏览器里，刷新页面继续同一个会话
+let sid = localStorage.getItem('lansid');
+if (!sid) {
+  sid = 'web-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  localStorage.setItem('lansid', sid);
+}
+
+// 已经渲染出来的消息条数。轮询时用它判断"有没有新消息"。
+let shown = 0;
+
+const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+function add(role, text) {
+  const d = document.createElement('div');
+  d.className = 'msg ' + role;
+  const who = { ai: '小岚（AI）', agent: '人工客服' }[role];
+  if (who) d.innerHTML = '<div class="who">' + who + '</div>' + esc(text);
+  else d.textContent = text;
+  log.appendChild(d);
+  log.scrollTop = log.scrollHeight;
+  shown++;
+  return d;
+}
+
+/** 把一条后端消息渲染到界面上。角色映射只在这里维护一份。 */
+function render(m) {
+  if (m.role === 'customer') add('me', m.content);
+  else if (m.role === 'ai') add('ai', m.content);
+  else if (m.role === 'agent') add('agent', m.content);
+  else add('sys', m.content);
+}
+
+function typing(on) {
+  let t = document.getElementById('typing');
+  if (on && !t) {
+    t = document.createElement('div');
+    t.id = 'typing';
+    t.className = 'typing';
+    t.innerHTML = '<i></i><i></i><i></i>';
+    log.appendChild(t);
+    log.scrollTop = log.scrollHeight;
+  } else if (!on && t) t.remove();
+}
+
+const TICKET = /TK\d{8,}/;
+
+async function send(text) {
+  text = (text || input.value).trim();
+  if (!text) return;
+  add('me', text);
+  input.value = '';
+  input.style.height = 'auto';
+  sendBtn.disabled = true;
+  typing(true);
+  statusEl.textContent = '小岚正在输入…';
+  try {
+    const r = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'X-API-Key': KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: sid, message: text }),
+    });
+    const d = await r.json();
+    typing(false);
+    if (d.need_key) {
+      add('err', d.reply);
+    } else if (!d.ok) {
+      add('err', d.reply || ('请求失败：' + (d.error || '未知错误')));
+    } else if (d.handed_off) {
+      // 人工接管期间：不显示 AI 回复，只提示"已转达"。
+      // 这时候要是让 AI 再答一句，客户会以为还是机器人在敷衍他。
+      add('sys', d.notice || '已转达给人工客服，请稍等');
+      statusEl.textContent = d.agent ? ('人工客服 ' + d.agent + ' 正在处理') : '人工客服正在处理';
+    } else {
+      add('ai', d.reply);
+      // AI 一旦给出工单号，说明已经转人工——在页面上显式提示一下，
+      // 让客户知道"接下来是人在处理"，而不是继续等机器人
+      const m = String(d.reply).match(TICKET);
+      if (m) {
+        add('sys', '已转人工 · 工单 ' + m[0] + ' · 你的对话记录已同步给坐席，无需重复描述');
+        statusEl.textContent = '人工客服即将接入';
+      }
+    }
+  } catch (e) {
+    typing(false);
+    add('err', '网络异常：' + e.message);
+  } finally {
+    sendBtn.disabled = false;
+    input.focus();
+  }
+}
+
+sendBtn.onclick = () => send();
+input.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+});
+input.addEventListener('input', () => {
+  input.style.height = 'auto';
+  input.style.height = Math.min(input.scrollHeight, 130) + 'px';
+});
+document.querySelectorAll('#quick button').forEach(b => b.onclick = () => send(b.textContent));
+document.getElementById('reset').onclick = () => {
+  localStorage.removeItem('lansid');
+  location.reload();
+};
+
+const WELCOME = '你好，我是轻岚优选的客服小岚。把订单号发我，物流、退货、换货、价保、发票我都能直接帮你查。';
+
+/** 打开页面时把历史对话拉回来。
+ *
+ * 消息一直存在后端（messages 表），之前只是页面没去读——
+ * 关掉浏览器再打开就只剩一句欢迎语，客户以为记录丢了。
+ * 真实客服系统里"上次聊到哪"是必须能续上的。
+ */
+async function loadHistory() {
+  try {
+    const r = await fetch('/api/conversation/' + encodeURIComponent(sid),
+                          { headers: { 'X-API-Key': KEY } });
+    const d = await r.json();
+    const msgs = d.messages || [];
+    if (!msgs.length) {
+      add('ai', WELCOME);
+      return;
+    }
+    msgs.forEach(m => {
+      render(m);
+    });
+    const tip = document.createElement('div');
+    tip.className = 'msg sys';
+    tip.textContent = '已恢复上次的对话记录（' + msgs.length + ' 条）';
+    log.insertBefore(tip, log.firstChild);
+  } catch (e) {
+    add('ai', WELCOME);
+  }
+}
+
+loadHistory();
+input.focus();
+
+/** 轮询新消息。
+ *
+ * 为什么必须有：客户转人工后，坐席是在另一个页面上回复的。
+ * 客户端如果不主动拉，就永远看不到人工的回复——客户会以为没人理他。
+ * 真实系统用 WebSocket 推，这里用轮询，效果一样、实现简单得多。
+ */
+async function pollNew() {
+  if (document.hidden) return;          // 页面没在前台就别拉，省资源
+  if (sendBtn.disabled) return;         // 正在等 AI 回复时不打断
+  try {
+    const r = await fetch('/api/conversation/' + encodeURIComponent(sid),
+                          { headers: { 'X-API-Key': KEY } });
+    const d = await r.json();
+    const msgs = d.messages || [];
+    if (msgs.length <= shown) return;
+    const fresh = msgs.slice(shown);
+    fresh.forEach(render);
+    if (fresh.some(m => m.role === 'agent')) statusEl.textContent = '人工客服已接入';
+    log.scrollTop = log.scrollHeight;
+  } catch (e) { /* 网络抖动就跳过，下一轮再试 */ }
+}
+setInterval(pollNew, 3000);
+</script>
+</body>
+</html>
