@@ -107,8 +107,10 @@ def read_intent(api: str, api_key: str, conversation_id: str) -> str:
 
 
 def run_set(name: str, path: Path, base: str, api: str, app_key: str, api_key: str,
-            limit: int, delay: float) -> dict:
+            limit: int, delay: float, only: set[str] | None = None) -> dict:
     cases = [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
+    if only:
+        cases = [c for c in cases if c["id"] in only]
     if limit:
         cases = cases[:limit]
     print(f"\n[{name}] {len(cases)} 条用例（{path.name}）")
@@ -293,6 +295,9 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--set", choices=["all", *SETS], default="all")
     ap.add_argument("--limit", type=int, default=0, help="每套只跑前 N 条，调试用")
+    ap.add_argument("--only", default="",
+                    help="只跑指定用例，逗号分隔，例如 --only C10,C12,K04"
+                         "（改完规则先拿上次错的用例验，3 分钟出结果）")
     ap.add_argument("--check", action="store_true",
                     help="自检：只跑一条，把「取不到意图」拆成后端 / Dify 两半定位")
     ap.add_argument("--delay", type=float, default=1.2,
@@ -313,9 +318,10 @@ def main() -> int:
     if args.check:
         return selfcheck(base, api, app_key, api_key)
 
+    only = {i.strip() for i in args.only.split(",") if i.strip()} or None
     sets = list(SETS) if args.set == "all" else [args.set]
-    results = [run_set(n, SETS[n], base, api, app_key, api_key, args.limit, args.delay)
-               for n in sets]
+    results = [run_set(n, SETS[n], base, api, app_key, api_key,
+                       args.limit, args.delay, only) for n in sets]
 
     total_hit = sum(r["hit"] for r in results)
     total = sum(r["total"] for r in results)
