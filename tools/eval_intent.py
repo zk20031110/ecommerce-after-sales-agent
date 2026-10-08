@@ -45,6 +45,8 @@ SETS = {
     "colloquial": ROOT / "tests" / "cases_colloquial.jsonl",
 }
 
+PROBE = "订单 2024091288765 我要退货"
+
 
 def load_env() -> None:
     """把项目根目录的 .env 读进环境变量（已存在的环境变量优先）。"""
@@ -132,6 +134,109 @@ def run_set(name: str, path: Path, base: str, api: str, app_key: str, api_key: s
     return {"name": name, "rows": rows, "hit": hit, "total": len(rows), "empty": empty}
 
 
+def post_form(url: str, fields: dict, headers: dict, timeout: int = 30) -> dict:
+    import urllib.parse
+    data = urllib.parse.urlencode(fields).encode("utf-8")
+    req = urllib.request.Request(
+        url, data=data, method="POST",
+        headers={"Content-Type": "application/x-www-form-urlencoded", **headers})
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        return json.loads(resp.read().decode("utf-8"))
+
+
+def show_conversation(api: str, api_key: str, conv: str) -> list[dict]:
+    data = get_json(f"{api}/api/conversation/{conv}", {"X-API-Key": api_key})
+    msgs = data.get("messages", [])
+    if not msgs:
+        print("    （后端库里没有这个会话的任何消息）")
+    for m in msgs:
+        print(f"    [{m.get('role')}] intent={m.get('intent') or '(空)'}  "
+              f"{str(m.get('content'))[:34]}")
+    return msgs
+
+
+def selfcheck(base: str, api: str, app_key: str, api_key: str) -> int:
+    """一次自检：把"意图取不到"这件事拆成后端 / Dify 两半，定位到底哪半边断的。"""
+    print("=" * 60)
+    print("自检：意图上报链路")
+    print("=" * 60)
+    print(f"后端地址        : {api}")
+    print(f"Dify 地址       : {base}")
+    print(f"Dify 应用密钥   : {'已配置 ' + app_key[:8] + '…' if app_key else '【缺失】'}")
+
+    # 1) 后端活着吗
+    try:
+        get_json(f"{api}/api/dashboard", {"X-API-Key": api_key})
+        print("后端连通        : √")
+    except Exception as e:  # noqa: BLE001
+        print(f"后端连通        : × {e}")
+        print("\n先把后端起起来：cd mock-api && python -m uvicorn main:app --port 8000")
+        return 2
+
+    # 2) 先判断 Dify 里跑的是不是新版 DSL：
+    #    新版把"降价"接到了价保接口，旧版会走知识库并答"不支持退差价"。
+    try:
+        probe_out = post_json(
+            f"{base}/chat-messages",
+            {"inputs": {}, "query": "刚买就降价了能退差价吗", "response_mode": "blocking",
+             "conversation_id": "", "user": f"probe-dsl-{int(time.time())}"},
+            {"Authorization": f"Bearer {app_key}"})
+        answer = str(probe_out.get("answer", ""))
+        print(f"\n新版 DSL 探测（价保问题）：")
+        print(f"    {answer[:120].replace(chr(10), ' ')}")
+        if "知识库" in answer or "不支持" in answer:
+            print("    → 这是**旧版**行为：降价被丢给了知识库。")
+            print("    先重新导入 dify/after-sales-agent.yml 再跑评测，否则结果没意义。")
+            return 1
+        print("    → 走了价保接口，说明新版 DSL 已生效。")
+    except Exception as e:  # noqa: BLE001
+        print(f"\n新版 DSL 探测失败：{e}")
+
+    # 3) 真跑一次工作流
+    conv = f"eval-check-{int(time.time())}"
+    try:
+        cid = ask_workflow(base, app_key, PROBE, conv)
+    except urllib.error.HTTPError as e:
+        print(f"Dify 调用       : × HTTP {e.code} "
+              f"{e.read().decode('utf-8', 'ignore')[:200]}")
+        return 2
+    except Exception as e:  # noqa: BLE001
+        print(f"Dify 调用       : × {e}")
+        return 2
+    print(f"Dify 调用       : √ 会话 {cid}")
+    print(f"\n工作流跑完后，后端库里记到的是：")
+    time.sleep(1.5)
+    msgs = show_conversation(api, api_key, cid)
+
+    # 4) 后端自己写一次意图，验证写库这半边
+    print("\n再手动让后端写一次意图（模拟工作流的上报节点）：")
+    try:
+        r = post_form(f"{api}/api/intent",
+                      {"session_id": cid, "intent": "退款退货"},
+                      {"X-API-Key": api_key})
+        print(f"    后端返回 {r}")
+    except Exception as e:  # noqa: BLE001
+        print(f"    × {e}")
+        return 2
+    time.sleep(0.5)
+    show_conversation(api, api_key, cid)
+
+    # 5) 给结论
+    print("\n" + "=" * 60)
+    if not msgs:
+        print("结论：工作流没把消息记到后端。")
+        print("  → Dify 里的「记录对话」节点访问不到后端（先看后端控制台有没有 POST /api/conversation/turn）。")
+    elif all(not (m.get("intent") or "") for m in msgs):
+        print("结论：消息能记上，但**意图没上报**——Dify 里跑的不是最新版 DSL。")
+        print("  → 把 dify/after-sales-agent.yml 重新导入一次；")
+        print("    导入后确认画布上有一个叫「上报意图」的节点，")
+        print("    它的 intent 变量取的是 「意图识别」的 class_name。")
+    else:
+        print("结论：链路是通的（上面最后一条消息已经有 intent 了），可以直接跑全量。")
+    print("=" * 60)
+    return 0
+
+
 def confusion(rows: list[dict]) -> list[str]:
     """混淆矩阵：把"错到哪儿去了"列出来，这是迭代提示词的直接输入。"""
     pairs: dict[tuple[str, str], list[str]] = {}
@@ -151,6 +256,8 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--set", choices=["all", *SETS], default="all")
     ap.add_argument("--limit", type=int, default=0, help="每套只跑前 N 条，调试用")
+    ap.add_argument("--check", action="store_true",
+                    help="自检：只跑一条，把「取不到意图」拆成后端 / Dify 两半定位")
     ap.add_argument("--delay", type=float, default=1.2,
                     help="每条用例之间的间隔秒数（默认 1.2，防止打爆后端）")
     args = ap.parse_args()
@@ -166,6 +273,9 @@ def main() -> int:
         print("  Dify → 打开应用 → 左侧「访问 API」→ 创建密钥，填进 .env 后重跑。")
         return 2
 
+    if args.check:
+        return selfcheck(base, api, app_key, api_key)
+
     sets = list(SETS) if args.set == "all" else [args.set]
     results = [run_set(n, SETS[n], base, api, app_key, api_key, args.limit, args.delay)
                for n in sets]
@@ -176,10 +286,12 @@ def main() -> int:
     print(f"\n总准确率：{total_hit}/{total} = {total_hit / total:.0%}")
 
     if empty_total:
-        print(f"\n! 有 {empty_total} 条取不到意图。最可能的原因：")
-        print("  Dify 里导入的 DSL 不是最新版——「记录对话」节点需要带上 intent 变量")
-        print("  （值填 {{#1800000000002.class_name#}}）。没有它，意图只存在 Dify 里，")
-        print("  后端拿不到，也就没法算准确率。")
+        print(f"\n! 有 {empty_total} 条取不到意图，这次的结果不能用。")
+        print("  先跑自检定位断点：python tools/eval_intent.py --check")
+        print("  最常见的两个原因：")
+        print("  1) Dify 里还是旧版 DSL —— 需要重新导入 dify/after-sales-agent.yml")
+        print("     导入后画布上应有一个「上报意图」节点（8 个类别各连一条边）")
+        print("  2) 「上报意图」节点的变量取错了 —— 应该取「意图识别」的 class_name")
 
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     lines = [
