@@ -49,6 +49,16 @@ RULE_STALE_LOGISTICS_HOURS = 48    # 物流超过多久没更新算异常
 RULE_REFUND_ETA = "1-7 个工作日"
 RULE_VERIFY_THRESHOLD = 300.0   # 退款金额达到这个数才要求核验手机号后四位
 
+# 价保只看降价原因，不看降了多少：官方调价可补差价，其余促销形式一律不参与。
+# 这条最容易做错——只看"降了 50 元"就赔钱，等于把平台的活动成本接过来。
+PRICE_DROP_SOURCE_CN = {
+    "official": "官方调价",
+    "flash_sale": "限时秒杀",
+    "coupon": "优惠券/红包抵扣",
+    "live": "直播专享价",
+    "clearance": "清仓价",
+}
+
 
 def now_utc() -> datetime:
     return datetime.now(timezone.utc)
@@ -540,6 +550,16 @@ def eligibility(body: EligibilityIn,
                 "next_step": "如果你看到了更低价格，把截图发我，我帮你转人工核实。",
                 "requires_human": False, "source": "after-sales-service",
             }
+        source = pd.get("source") or "official"
+        if source != "official":
+            return {
+                "eligible": False, "decision": "price_protection_excluded",
+                "rule_code": "RULE-PP-EXCLUDED",
+                "rule_text": f"本次降价来自{PRICE_DROP_SOURCE_CN.get(source, '非官方调价')}，"
+                             f"按价保规则不参与补差价。",
+                "next_step": "如果你认为降价是官方调价，把价格截图发我，我帮你转人工核实。",
+                "requires_human": False, "source": "after-sales-service",
+            }
         if within(o["signed_at"], RULE_PRICE_PROTECTION_DAYS):
             return {
                 "eligible": True, "decision": "price_protection_ok",
@@ -883,6 +903,38 @@ async def record_turn(request: Request, x_api_key: Optional[str] = Header(None),
         "last_order_no": s.get("last_order_no", ""),
         "source": "conversation-service",
     }
+
+
+@app.post("/api/intent")
+async def record_intent(request: Request, x_api_key: Optional[str] = Header(None),
+                        authorization: Optional[str] = Header(None)):
+    """工作流的分类器判完意图后，单独回报一次。
+
+    为什么要单独开一个接口，而不是塞进「记录对话」：
+    Dify **只允许节点引用上游节点的输出**，而「记录对话」在分类器**之前**执行，
+    引用 `{{#意图识别.class_name#}}` 会取不到值。
+    所以 DSL 里用了一个旁路节点「上报意图」，8 个类别各连一条边，
+    谁被选中谁就跑这一条，后端再把意图补写到这一轮的客户消息上。
+
+    这一列的唯一用途是让"意图识别准确率"能算出来（tools/eval_intent.py）。
+    意图判错是后面所有分支走错的源头，这个数字必须有。
+    """
+    auth(x_api_key, authorization)
+    ctype = (request.headers.get("content-type") or "").lower()
+    if "application/json" in ctype:
+        body = await request.json()
+    else:
+        form = await request.form()
+        body = {k: str(v) for k, v in form.items()}
+
+    session_id = resolve_session(str(body.get("session_id") or "").strip())
+    intent = str(body.get("intent") or "").strip()
+    if not session_id:
+        return {"ok": False, "message": "缺少 session_id", "source": "intent-reporter"}
+
+    saved = storage.set_last_message_intent(DB, session_id, intent)
+    return {"ok": saved, "session_id": session_id, "intent": intent,
+            "source": "intent-reporter"}
 
 
 @app.get("/api/conversation/{session_id}")

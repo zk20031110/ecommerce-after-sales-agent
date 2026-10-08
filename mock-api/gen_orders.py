@@ -167,13 +167,19 @@ SCENARIOS = [
          signed_days_ago=5, flags={}, company="顺丰速运", tracking="SF9988776655",
          logistics_state="已签收", last_update_hours_ago=120,
          traces=[(120, "快件已签收，签收人：本人")],
-         price_drop=(299.00, 50.00, 1)),
+         price_drop=(299.00, 50.00, 1, "official")),
     dict(order_no="2024093012015", scenario="签收 20 天，虽降价但已过 15 天价保期",
          status="已签收", items=[("XD-003", 1)], paid_days_ago=24, shipped_days_ago=22,
          signed_days_ago=20, flags={}, company="中通快递", tracking="ZT1010101010",
          logistics_state="已签收", last_update_hours_ago=480,
          traces=[(480, "快件已签收，签收人：本人")],
-         price_drop=(199.00, 60.00, 2)),
+         price_drop=(199.00, 60.00, 2, "official")),
+    dict(order_no="2024093012019", scenario="签收 3 天，但降价来自限时秒杀（不参与价保）",
+         status="已签收", items=[("YD-001", 1)], paid_days_ago=7, shipped_days_ago=5,
+         signed_days_ago=3, flags={}, company="顺丰速运", tracking="SF1212121212",
+         logistics_state="已签收", last_update_hours_ago=72,
+         traces=[(72, "快件已签收，签收人：本人")],
+         price_drop=(159.00, 40.00, 1, "flash_sale")),
 ]
 
 
@@ -226,6 +232,9 @@ def build(s: dict, skus: dict[str, dict]) -> dict | None:
             "current_price": s["price_drop"][0],
             "diff": s["price_drop"][1],
             "changed_days_ago": s["price_drop"][2],
+            # 降价原因决定了能不能价保：官方调价可以，优惠券/秒杀/直播专享价不参与。
+            # 这是价保规则里最容易被忽略、也最容易赔钱的一条——只看"降了多少"会算错。
+            "source": s["price_drop"][3] if len(s["price_drop"]) > 3 else "official",
         },
     }
 
@@ -316,6 +325,12 @@ def write_doc(orders: dict) -> None:
         "|---|---|",
         "| `2024091922331` | 签收 5 天降价 50 元，**可退差价 50** |",
         "| `2024093012015` | 签收 20 天，超过 15 天价保期，转人工 |",
+        "| `2024093012019` | 签收 3 天降价 40 元，但降价来自**限时秒杀**，按规则不参与价保 |",
+        "",
+        "价保只看**降价原因**，不看降了多少：官方调价可以补差价，"
+        "优惠券、红包、限时秒杀、直播专享价、清仓价都不参与。"
+        "订单数据里 `price_drop.source` 就是这个字段，"
+        "只看金额不看来源会把不该赔的钱赔出去。",
         "",
         "### 提交售后单（POST /api/after-sales/refunds）",
         "",

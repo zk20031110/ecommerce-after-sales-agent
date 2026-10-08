@@ -270,7 +270,7 @@ def main_test() -> int:
     print("[13] 运行指标")
     m = client.get("/metrics", headers=KEY).json()
     check("指标接口可用", m.get("total_requests", 0) > 0, str(m)[:200])
-    check("统计了订单数", m.get("orders_loaded") == 23, str(m)[:200])
+    check("统计了订单数", m.get("orders_loaded") == 24, str(m)[:200])
     check("统计了活跃会话", m.get("active_sessions", 0) >= 1, str(m)[:200])
     check("统计了退款单数", m.get("refunds_created", 0) >= 3, str(m)[:200])
 
@@ -292,6 +292,22 @@ def main_test() -> int:
     check("会话历史可查", len(c.get("messages", [])) >= 3, str(c)[:150])
     check("历史保留了客户原话",
           any("垃圾" in m.get("content", "") for m in c.get("messages", [])), str(c)[:150])
+
+    # 意图落库：分类器判完之后，DSL 里的「上报意图」旁路节点单独回报一次，
+    # 后端把它补写到这一轮的客户消息上。没有这一列就算不出"意图识别准确率"。
+    # （为什么不在「记录对话」里带：那个节点在分类器之前执行，Dify 不允许引用下游输出。）
+    client.post("/api/conversation/turn", headers=KEY,
+                json={"session_id": S2, "message": "刚买就降价了能退差价吗"})
+    r = client.post("/api/intent", headers=KEY,
+                    data={"session_id": S2, "intent": "价保"}).json()
+    check("意图上报接口写入成功", r.get("ok") is True, str(r)[:200])
+    c2 = client.get(f"/api/conversation/{S2}", headers=KEY).json()
+    intents = [m.get("intent") for m in c2.get("messages", [])
+               if m.get("role") == "customer" and m.get("intent")]
+    check("意图补写到了这一轮的客户消息上", intents and intents[-1] == "价保", str(intents))
+    r = client.post("/api/intent", headers=KEY,
+                    data={"session_id": "", "intent": "价保"}).json()
+    check("上报意图缺 session_id 时被拒绝", r.get("ok") is False, str(r))
 
     print("[15] 转人工：坐席交接摘要")
     t = client.post("/api/tickets", headers=KEY,

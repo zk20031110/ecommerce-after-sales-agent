@@ -16,8 +16,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# 与问题分类器的六个类别保持一致（改这里也要同步 prompts/classifier_instruction.txt）
-CLASSES = {"物流查询", "退款退货", "换货", "通用咨询", "投诉情绪", "转人工", "确认提交"}
+# 与问题分类器的八个类别保持一致（改这里也要同步 prompts/classifier_instruction.txt）
+CLASSES = {"物流查询", "退款退货", "换货", "价保", "通用咨询", "投诉情绪", "转人工", "确认提交"}
 
 errors: list[str] = []
 warnings: list[str] = []
@@ -117,6 +117,19 @@ def check_one_dsl(path: Path, yaml) -> None:
             for key in ("method", "authorization", "body", "timeout"):
                 if key not in data:
                     warnings.append(f"{rel} HTTP 节点「{title}」缺少字段 {key}")
+
+        elif ntype == "knowledge-retrieval":
+            # 一个检索节点挂多个库 = 又合并回一个大库，会串味（实测类型命中率从 93% 掉到 43%）。
+            # 正确做法是按意图路由到单个库，所以这里把"多库节点"报出来。
+            # 注意变量名不要叫 ids——上面那个 ids 是"所有节点 id 的集合"，
+            # 覆盖掉它会让后面的变量引用校验全部误报（踩过）。
+            dataset_ids = data.get("dataset_ids") or []
+            if not dataset_ids:
+                errors.append(f"{rel} 检索节点「{title}」没选知识库，永远检索不到东西")
+            elif len(dataset_ids) > 1:
+                warnings.append(
+                    f"{rel} 检索节点「{title}」挂了 {len(dataset_ids)} 个库，等于合并成一个大库，"
+                    f"会串味；应该按意图拆成单库检索")
 
         elif ntype == "llm":
             m = data.get("model", {})
