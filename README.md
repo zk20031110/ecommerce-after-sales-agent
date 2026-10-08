@@ -98,7 +98,7 @@
 │   ├── console.html                ← **坐席工作台**：人工接管
 │   └── dashboard.html              ← **数据看板**：指标与未解决原因排行
 ├── tests/
-│   ├── smoke_test.py               ← 后端冒烟测试（148 项断言）
+│   ├── smoke_test.py               ← 后端冒烟测试（151 项断言）
 │   ├── cases.jsonl                 ← 54 条标准问法评测用例
 │   └── cases_colloquial.jsonl      ← 50 条口语问法用例
 └── tools/
@@ -306,7 +306,7 @@ docker exec -it docker-api-1 curl -s http://host.docker.internal:8000/health
 ### 后端自测
 
 ```bash
-python tests/smoke_test.py      # 148 项断言
+python tests/smoke_test.py      # 151 项断言
 python tools/validate_assets.py # DSL 与评测集规范校验
 python tools/eval_intent.py     # 意图识别准确率（需要后端 + Dify 都在跑）
 ```
@@ -387,6 +387,7 @@ python tools/eval_intent.py     # 意图识别准确率（需要后端 + Dify �
 | W16 | **检索口径和线上配置不一致** | 评测是"每个问题只查它该查的那个库"，线上节点却把三个库全挂上了 | 通用咨询加一层分流，按类型路由到单库 | 93% 这个数字在线上才成立 |
 | W16 | 价保只看金额不看降价原因 | 秒杀/优惠券降的价也照赔，等于把平台活动成本接过来 | 订单数据加 `price_drop.source`，非官方调价一律不参与价保 | 新增 1 个场景订单 |
 | W16 | 意图准确率只能凭感觉说 | 90 条用例躺在文件里，没人跑得动 | 「记录对话」节点回传 `intent` + `tools/eval_intent.py` 自动跑分 | 能报出实测数字 |
+| W17 | **秒杀单也答应赔差价** | 自检发现订单数已经是 24、价保判定却仍是"可退" | 加载订单时漏带了 `price_drop.source`（`orders.json` 里有、内存里丢了）→ 补上 + 加 3 项回归测试 | 三种价保结局都对了 |
 
 ---
 

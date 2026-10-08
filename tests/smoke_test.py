@@ -122,6 +122,22 @@ def main_test() -> int:
     ).json()
     check("价保通过", e["eligible"] is True, str(e))
     check("差价为 50", e["refund_amount"] == 50.00, str(e))
+    # 价保不看"降了多少"，看"为什么降"：秒杀/优惠券/直播价不参与。
+    # 这一条是自检抓出来的漏洞——加载订单时漏带了 source 字段，
+    # 结果秒杀单也被判成可退差价，等于把平台活动成本接过来。
+    e2 = client.post("/api/after-sales/eligibility", headers=KEY,
+                     json={"order_no": "2024093012019", "request_type": "price_protection",
+                           "reason": "秒杀降的价"}).json()
+    check("秒杀降价不参与价保",
+          e2.get("decision") == "price_protection_excluded", str(e2))
+    check("说明拒绝原因时点出降价来源",
+          "限时秒杀" in str(e2.get("rule_text", "")), str(e2.get("rule_text")))
+    e2 = client.post("/api/after-sales/eligibility", headers=KEY,
+                     json={"order_no": "2024093012015", "request_type": "price_protection",
+                           "reason": "降价了"}).json()
+    check("过了 15 天价保期转人工",
+          e2.get("decision") == "price_protection_expired" and e2.get("requires_human") is True,
+          str(e2))
 
     print("[6.5] 新增场景：品类限制 / 时间边界 / 质保 / 换货限次")
     cases = [
