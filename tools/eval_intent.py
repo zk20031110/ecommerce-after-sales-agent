@@ -176,7 +176,8 @@ def selfcheck(base: str, api: str, app_key: str, api_key: str) -> int:
     # 1.5) 后端跑的是不是新版代码 + 新数据
     #      后端启动时把 orders.json 读进内存，改了数据不重启就还是旧的。
     try:
-        m = get_json(f"{api}/api/metrics", {"X-API-Key": api_key})
+        # 注意：这个接口是 /metrics，没有 /api 前缀（其他业务接口才有）。
+        m = get_json(f"{api}/metrics", {"X-API-Key": api_key})
         n = m.get("orders_loaded")
         print(f"后端订单数      : {n}（新版应为 24）")
         stale = []

@@ -307,6 +307,9 @@ def load_orders() -> Dict[str, Dict[str, Any]]:
                 "current_price": pd["current_price"],
                 "diff": pd["diff"],
                 "changed_at": ts(days=pd.get("changed_days_ago")),
+                # 降价来源必须一起带过来：价保判定看的就是这个字段。
+                # 之前漏了它，导致秒杀单也按"可退差价"处理（自检抓出来的）。
+                "source": pd.get("source", "official"),
             },
         }
     print(f"[mock-api] 已加载 {len(out)} 个场景订单")
