@@ -26,6 +26,8 @@
   header button{background:none;border:1px solid var(--line);color:var(--dim);
                 border-radius:7px;padding:5px 11px;font:inherit;font-size:12px;cursor:pointer}
   header button:hover{color:var(--brand);border-color:var(--brand)}
+  header .demo-button{border-color:#bfd5ce;background:#edf5f1;color:#245848}
+  header .demo-button[aria-pressed="true"]{background:#245848;color:#fff;border-color:#245848}
   #log{flex:1;overflow-y:auto;padding:20px 18px;display:flex;flex-direction:column;gap:12px}
   .msg{max-width:78%;padding:10px 14px;border-radius:12px;white-space:pre-wrap;word-break:break-word}
   .msg.ai{background:#f1f4f7;align-self:flex-start;border-bottom-left-radius:4px}
@@ -62,6 +64,7 @@
       <div class="sub" id="status">小岚为你服务</div>
     </div>
     <div class="spacer"></div>
+    <button id="demoMode" class="demo-button" type="button" aria-pressed="false">样例演示</button>
     <button id="reset">新会话</button>
   </header>
 
@@ -78,7 +81,7 @@
     <textarea id="input" rows="1" placeholder="描述你的问题，例如：订单 2024091288765 我要退货"></textarea>
     <button class="send" id="send">发送</button>
   </footer>
-  <div class="hint">AI 会先帮你处理，需要人工时会自动转接并带上你的上下文</div>
+  <div class="hint" id="modeHint">AI 会先帮你处理，需要人工时会自动转接并带上你的上下文</div>
 </div>
 
 <script>
@@ -87,6 +90,9 @@ const log = document.getElementById('log');
 const input = document.getElementById('input');
 const sendBtn = document.getElementById('send');
 const statusEl = document.getElementById('status');
+const demoBtn = document.getElementById('demoMode');
+const modeHint = document.getElementById('modeHint');
+let demoMode = localStorage.getItem('landemo') === '1';
 
 // 会话 ID 存在浏览器里，刷新页面继续同一个会话
 let sid = localStorage.getItem('lansid');
@@ -134,6 +140,98 @@ function typing(on) {
 
 const TICKET = /TK\d{8,}/;
 
+function setDemoMode(enabled, announce = false) {
+  demoMode = enabled;
+  localStorage.setItem('landemo', enabled ? '1' : '0');
+  demoBtn.setAttribute('aria-pressed', String(enabled));
+  demoBtn.textContent = enabled ? '退出演示' : '样例演示';
+  statusEl.textContent = enabled ? '本地样例演示 · 不调用 Dify' : '小岚为你服务';
+  modeHint.textContent = enabled
+    ? '使用本地模拟订单与业务规则；不调用 Dify/大模型、不提交退款或创建工单，对话只保留在当前页面。'
+    : 'AI 会先帮你处理，需要人工时会自动转接并带上你的上下文';
+  if (announce) {
+    add('sys', enabled
+      ? '样例演示已开启：只查询本地模拟数据和规则，不调用 Dify，不会提交退款或创建工单。'
+      : '已退出样例演示，恢复 Dify 在线客服流程。');
+  }
+}
+
+async function demoApi(url, options = {}) {
+  const r = await fetch(url, {
+    ...options,
+    headers: { 'X-API-Key': KEY, ...(options.headers || {}) },
+  });
+  const data = await r.json();
+  if (!r.ok) throw new Error(data.detail || ('HTTP ' + r.status));
+  return data;
+}
+
+/** 本地样例只调用模拟订单、政策和资格接口，不提交退款或创建工单。 */
+async function demoReply(text) {
+  const orderNo = (text.match(/\b\d{10,16}\b/) || [])[0] || '';
+  try {
+    if (/物流|快递|发货|到哪|配送|催件|运输/.test(text)) {
+      if (!orderNo) return '请提供订单号后再查物流，例如：订单 2024092004455 我的货到哪了。';
+      const order = await demoApi('/api/order-query?order_no=' + encodeURIComponent(orderNo));
+      if (!order.found) return order.message || '没有查到这笔模拟订单，请核对订单号。';
+      const logistics = order.logistics || {};
+      const lines = [
+        '订单 ' + order.order_no + '：' + order.status,
+        logistics.carrier ? '承运商：' + logistics.carrier : '',
+        logistics.tracking_no ? '运单号：' + logistics.tracking_no : '',
+        logistics.latest_status || logistics.last_status || '',
+        order.logistics_abnormal ? '提醒：物流超过 48 小时未更新，建议联系承运商核实。' : '',
+        logistics.last_update ? '最近更新：' + logistics.last_update : '',
+      ].filter(Boolean);
+      return '本地模拟查询结果\n' + lines.join('\n') + '\n\n演示模式只读取模拟订单，不会发起售后操作。';
+    }
+
+    if (/投诉|人工客服|转人工|找坐席/.test(text)) {
+      return '这个场景在完整流程中会创建工单并交给坐席。本地演示不会创建工单；配置 Dify 后可体验真实转人工链路。';
+    }
+
+    if (!orderNo && /运费|发票|政策|规则/.test(text)) {
+      const keyword = /运费/.test(text) ? '运费' : /发票/.test(text) ? '发票' : '退货';
+      const policy = await demoApi('/api/after-sales/policy?q=' + encodeURIComponent(keyword));
+      const hits = policy.hits || [];
+      return hits.length
+        ? '本地政策检索结果\n' + hits.map((item) => '· ' + item.text).join('\n')
+          + '\n\n演示模式仅展示模拟政策，不调用大模型。'
+        : '本地模拟政策库没有找到匹配内容；切换到在线客服后可使用知识库问答。';
+    }
+
+    const requestType = /价保|差价|降价/.test(text) ? 'price_protection'
+      : /换货|换一个|换个/.test(text) ? 'exchange'
+        : /退货|退款|退钱/.test(text) ? 'refund' : '';
+
+    if (requestType) {
+      if (!orderNo) return '请带上订单号，我才能按本地模拟规则判断资格。示例：订单 2024091288765 我要退货。';
+      const result = await demoApi('/api/after-sales/eligibility', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_no: orderNo, request_type: requestType, reason: text }),
+      });
+      const action = { refund: '退货', exchange: '换货', price_protection: '价保' }[requestType];
+      const amount = Number.isFinite(Number(result.refund_amount)) && result.refund_amount !== undefined
+        ? '\n规则计算金额：¥' + Number(result.refund_amount).toFixed(2) : '';
+      const next = result.requires_human
+        ? '\n该申请需要人工审核。本地演示不会创建工单。'
+        : result.eligible
+          ? '\n本地演示只展示资格判断，不会提交' + action + '或退款。'
+          : '';
+      return action + '资格：' + (result.eligible ? '符合' : result.requires_human ? '需人工审核' : '不符合')
+        + '\n' + (result.rule_text || '') + amount
+        + (result.next_step ? '\n下一步：' + result.next_step : '') + next;
+    }
+
+    return '样例演示支持物流查询、退货/换货资格、价保政策和运费/发票查询。你可以点击下方示例问题试试。';
+  } catch (e) {
+    return '本地模拟服务暂不可用：' + e.message + '。请确认模拟后端已启动，再重试。';
+  }
+}
+
+demoBtn.onclick = () => setDemoMode(!demoMode, true);
+
 async function send(text) {
   text = (text || input.value).trim();
   if (!text) return;
@@ -144,6 +242,14 @@ async function send(text) {
   typing(true);
   statusEl.textContent = '小岚正在输入…';
   try {
+    if (demoMode) {
+      const reply = await demoReply(text);
+      typing(false);
+      add('ai', reply);
+      statusEl.textContent = '本地样例演示 · 不调用 Dify';
+      return;
+    }
+
     const r = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'X-API-Key': KEY, 'Content-Type': 'application/json' },
@@ -202,6 +308,11 @@ const WELCOME = '你好，我是轻岚优选的客服小岚。把订单号发我
  * 真实客服系统里"上次聊到哪"是必须能续上的。
  */
 async function loadHistory() {
+  if (demoMode) {
+    add('sys', '样例演示模式：使用本地模拟数据，不调用 Dify，也不会提交退款或创建工单。');
+    add('ai', WELCOME);
+    return;
+  }
   try {
     const r = await fetch('/api/conversation/' + encodeURIComponent(sid),
                           { headers: { 'X-API-Key': KEY } });
@@ -233,7 +344,7 @@ input.focus();
  * 真实系统用 WebSocket 推，这里用轮询，效果一样、实现简单得多。
  */
 async function pollNew() {
-  if (document.hidden) return;          // 页面没在前台就别拉，省资源
+  if (demoMode || document.hidden) return; // 样例演示不轮询会话后端
   if (sendBtn.disabled) return;         // 正在等 AI 回复时不打断
   try {
     const r = await fetch('/api/conversation/' + encodeURIComponent(sid),
@@ -248,6 +359,7 @@ async function pollNew() {
   } catch (e) { /* 网络抖动就跳过，下一轮再试 */ }
 }
 setInterval(pollNew, 3000);
+setDemoMode(demoMode);
 </script>
 </body>
 </html>
