@@ -54,37 +54,50 @@
   footer a{color:var(--accent);text-decoration:none}
   code{background:#0d131a;padding:1px 6px;border-radius:3px;font-size:12.5px}
 </style>
+<link rel="stylesheet" href="/theme.css">
 </head>
-<body>
+<body class="page-home">
 <div class="wrap">
-  <span class="tag">Dify + 通义千问 + FastAPI</span>
-  <h1>电商售后客服 Agent<br><em>把"查得到的"自动化，把"判不了的"交给人工</em></h1>
-  <p class="lead">
-    一个能真正跑起来的售后客服系统：AI 负责理解与表达，后端负责规则与数据，
-    坐席工作台负责人工接管。三条链路打通，不是只能演示的空壳。
-  </p>
+  <header class="home-hero">
+    <div class="hero-main">
+      <span class="tag">售后自动化 · 人工协同</span>
+      <h1>让售后判断有规则，<br><em>让每次交接都有上下文。</em></h1>
+      <p class="lead">电商售后 AI Agent：处理物流、退换货与价保等高频问题；业务规则由后端校验，复杂或高风险诉求交给坐席，结论可以追溯。</p>
+      <div class="hero-points" aria-label="产品特点">
+        <span>规则校验在后端</span><span>政策回答可追溯</span><span>高风险人工接管</span>
+      </div>
+    </div>
+    <div class="hero-aside">
+      <span class="eyebrow">处理闭环</span>
+      <div class="hero-step"><i>01</i><span>理解问题与订单</span></div>
+      <div class="hero-step"><i>02</i><span>按规则查询与判断</span></div>
+      <div class="hero-step"><i>03</i><span>自动处理或转交坐席</span></div>
+      <div class="hero-footnote">演示数据为本地模拟数据，页面会标明样例模式与在线模式。</div>
+    </div>
+  </header>
 
+  <h2 id="experience">产品体验</h2>
   <div class="entries">
     <a class="card" href="/client">
-      <div class="ico">💬</div>
+      <div class="card-kicker">01 · CUSTOMER</div>
+      <div class="ico">↗</div>
       <h3>客户端</h3>
-      <p>客户和 AI 对话。试着说"订单 2024091288765 我要退货"，
-         然后回一个"好"——它会真的提交退款。</p>
-      <div class="go">打开聊天页 →</div>
+      <p>先开启样例演示，试试物流查询、退货资格和政策问题。演示不会提交退款或创建工单。</p>
+      <div class="go">体验客户流程 <span>→</span></div>
     </a>
     <a class="card" href="/console">
-      <div class="ico">🎧</div>
+      <div class="card-kicker">02 · HUMAN HANDOFF</div>
+      <div class="ico">↗</div>
       <h3>坐席工作台</h3>
-      <p>人工客服的界面。能看到工单、客户的完整对话、AI 已查到的数据，
-         直接接入、回复、转主管、关闭。</p>
-      <div class="go">打开工作台 →</div>
+      <p>按优先级处理工单，查看交接摘要和完整对话，再接入、回复、升级或记录处理结果。</p>
+      <div class="go">查看人工接管 <span>→</span></div>
     </a>
     <a class="card" href="/dashboard">
-      <div class="ico">📊</div>
+      <div class="card-kicker">03 · OPERATIONS</div>
+      <div class="ico">↗</div>
       <h3>数据看板</h3>
-      <p>转人工率、自助解决率、平均轮次、满意度，以及
-         「未解决原因排行」——周度迭代就靠这张表。</p>
-      <div class="go">打开看板 →</div>
+      <p>查看自助解决、转人工、对话轮次、满意度及未解决原因；无数据时明确显示为空。</p>
+      <div class="go">查看服务指标 <span>→</span></div>
     </a>
   </div>
 
@@ -105,7 +118,10 @@
                                                       +--> 关闭时记录「未解决原因」--> 迭代</pre>
   </div>
 
-  <h2>当前运行数据（实时）</h2>
+  <div class="section-heading">
+    <div><h2>运行表现</h2><p>指标来自本地运行数据，不用预设数字代替实际结果。</p></div>
+    <span class="live-label"><i></i> SQLite 实时统计</span>
+  </div>
   <div class="metrics">
     <div class="m"><div class="v" id="v-sessions">—</div><div class="k">会话数</div></div>
     <div class="m"><div class="v" id="v-handoff">—</div><div class="k">转人工率（目标 20%~35%）</div></div>

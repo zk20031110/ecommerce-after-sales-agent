@@ -54,8 +54,9 @@
   footer .send:disabled{opacity:.45;cursor:not-allowed}
   .hint{font-size:12px;color:var(--dim);padding:0 18px 12px;text-align:center}
 </style>
+<link rel="stylesheet" href="/theme.css">
 </head>
-<body>
+<body class="page-client">
 <div class="shell">
   <header>
     <div class="logo">岚</div>
@@ -64,24 +65,48 @@
       <div class="sub" id="status">小岚为你服务</div>
     </div>
     <div class="spacer"></div>
+    <a class="top-link" href="/">项目总览</a>
     <button id="demoMode" class="demo-button" type="button" aria-pressed="false">样例演示</button>
     <button id="reset">新会话</button>
   </header>
 
-  <div id="log"></div>
+  <div class="conversation-layout">
+    <section class="conversation-main" aria-label="客户服务对话">
+      <div class="conversation-title">
+        <div><span class="eyebrow">售后服务 · 在线客服</span><h2>您好，有什么可以帮您？</h2></div>
+        <span class="privacy-label">订单信息仅用于本次查询</span>
+      </div>
+      <div id="log"></div>
 
-  <div class="quick" id="quick">
-    <button>订单 2024091288765 我的货到哪了</button>
-    <button>订单 2024091288765 我要退货</button>
-    <button>退货运费谁承担</button>
-    <button>我要投诉</button>
+      <div class="quick-label">常见问题</div>
+      <div class="quick" id="quick">
+        <button>订单 2024091288765 我的货到哪了</button>
+        <button>订单 2024091288765 我要退货</button>
+        <button>退货运费谁承担</button>
+        <button>我要投诉</button>
+      </div>
+
+      <footer>
+        <textarea id="input" rows="1" placeholder="描述你的问题，例如：订单 2024091288765 我要退货"></textarea>
+        <button class="send" id="send">发送</button>
+      </footer>
+      <div class="hint" id="modeHint">AI 会先帮你处理，需要人工时会自动转接并带上你的上下文</div>
+    </section>
+    <aside class="service-panel">
+      <span class="eyebrow">服务流程</span>
+      <h2>从问题到处理结果</h2>
+      <ol class="service-steps">
+        <li><i>1</i><span><b>描述问题</b><small>可直接输入订单号和诉求</small></span></li>
+        <li><i>2</i><span><b>核验订单与规则</b><small>资格由业务规则校验</small></span></li>
+        <li><i>3</i><span><b>自动处理或转人工</b><small>复杂诉求由坐席继续跟进</small></span></li>
+      </ol>
+      <div class="service-note">
+        <strong>演示说明</strong>
+        <p>开启“样例演示”后，系统只查询模拟订单和政策，不调用 Dify，不提交退款，也不创建工单。</p>
+      </div>
+      <a class="panel-link" href="/console">查看坐席如何接管 <span>→</span></a>
+    </aside>
   </div>
-
-  <footer>
-    <textarea id="input" rows="1" placeholder="描述你的问题，例如：订单 2024091288765 我要退货"></textarea>
-    <button class="send" id="send">发送</button>
-  </footer>
-  <div class="hint" id="modeHint">AI 会先帮你处理，需要人工时会自动转接并带上你的上下文</div>
 </div>
 
 <script>

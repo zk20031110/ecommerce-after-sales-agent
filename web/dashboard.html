@@ -44,14 +44,25 @@
   .note b{color:var(--ink);font-weight:600}
   code{background:#0d1117;padding:1px 5px;border-radius:3px;font-size:12px}
 </style>
+<link rel="stylesheet" href="/theme.css">
 </head>
-<body>
+<body class="page-dashboard">
 <div class="wrap">
-  <h1>售后 Agent · 数据看板</h1>
-  <div class="sub">
-    数据源：本机 SQLite（会话 / 消息 / 工单 / 退款）　·　
-    <a href="/client">客户端</a>　<a href="/console">坐席工作台</a>　<a href="/dashboard">刷新</a>
-  </div>
+  <header class="dashboard-header">
+    <div>
+      <a class="back-link" href="/">← 项目总览</a>
+      <div class="dashboard-kicker">SERVICE OPERATIONS</div>
+      <h1>售后服务运营</h1>
+      <p class="dashboard-lead">用真实运行数据观察自动化质量、人工兜底和客户体验。</p>
+    </div>
+    <div class="dashboard-header-side">
+      <span class="live-label"><i></i> 本地数据实时刷新</span>
+      <div class="sub">
+        数据源：本机 SQLite（会话 / 消息 / 工单 / 退款）　·　
+        <a href="/client">客户端</a>　<a href="/console">坐席工作台</a>
+      </div>
+    </div>
+  </header>
 
   <div class="grid k4">
     <div class="card metric">

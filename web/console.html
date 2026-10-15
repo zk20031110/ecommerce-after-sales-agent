@@ -57,22 +57,33 @@
   button.primary:hover{filter:brightness(1.12)}
   button.danger:hover{border-color:var(--hot);color:var(--hot)}
 </style>
+<link rel="stylesheet" href="/theme.css">
 </head>
-<body>
+<body class="page-console">
 <header>
-  <h1>售后坐席工作台</h1>
-  <div class="stat hot">排队中 <b id="s-wait">0</b></div>
-  <div class="stat">处理中 <b id="s-doing">0</b></div>
-  <div class="stat">已解决 <b id="s-done">0</b></div>
-  <div class="stat hot">高优先级 <b id="s-hot">0</b></div>
+  <div class="console-brand">
+    <a class="brand-mark" href="/" aria-label="返回项目总览">岚</a>
+    <div><h1>坐席工作台</h1><p>人工接管与售后闭环</p></div>
+  </div>
+  <div class="console-stats">
+    <div class="stat hot"><b id="s-wait">0</b><span>排队中</span></div>
+    <div class="stat"><b id="s-doing">0</b><span>处理中</span></div>
+    <div class="stat"><b id="s-done">0</b><span>已解决</span></div>
+    <div class="stat hot"><b id="s-hot">0</b><span>高优先级</span></div>
+  </div>
   <div class="spacer"></div>
-  <div class="stat">坐席</div>
-  <input id="agent" value="小陈 8801">
-  <button id="refresh">刷新</button>
+  <nav class="console-nav"><a href="/">项目总览</a><a href="/dashboard">运营数据</a></nav>
+  <div class="agent-control"><label for="agent">当前坐席</label><input id="agent" value="小陈 8801"></div>
+  <button class="refresh-button" id="refresh">刷新队列</button>
 </header>
 <main>
-  <div id="list"></div>
-  <div id="detail"><div class="empty">左侧选一张工单</div></div>
+  <section class="queue-pane">
+    <div class="queue-heading"><div><h2>待办工单</h2><p>按优先级与状态持续更新</p></div><span>LIVE</span></div>
+    <div id="list"></div>
+  </section>
+  <section class="detail-pane" aria-label="工单详情">
+    <div id="detail"><div class="empty">从左侧选择一张工单，查看交接信息与处理记录</div></div>
+  </section>
 </main>
 <script>
 const KEY = 'dev-local-key';          // 与后端 MOCK_API_KEY 一致

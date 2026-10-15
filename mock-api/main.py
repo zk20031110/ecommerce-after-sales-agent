@@ -1106,6 +1106,15 @@ def _page(filename: str):
     return FileResponse(p)
 
 
+@app.get("/theme.css", include_in_schema=False)
+def theme_css():
+    """为各页面提供统一的品牌样式。"""
+    p = WEB_DIR / "theme.css"
+    if not p.is_file():
+        raise HTTPException(status_code=404, detail="缺少前端样式 web/theme.css")
+    return FileResponse(p, media_type="text/css")
+
+
 @app.get("/", include_in_schema=False)
 def home_page():
     """入口页。"""
